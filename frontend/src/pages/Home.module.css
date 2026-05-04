@@ -1,0 +1,149 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 100px 24px 80px;
+  overflow: hidden;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 60% 50%, rgba(124,58,237,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(6,182,212,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 580px;
+  flex: 1;
+}
+
+.heroBadge { margin-bottom: 20px; display: inline-flex; }
+
+.heroTitle {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.heroDesc {
+  font-size: 1.1rem;
+  color: var(--text2);
+  line-height: 1.7;
+  max-width: 480px;
+  margin-bottom: 36px;
+}
+
+.heroCta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.statValue { font-size: 1.5rem; font-weight: 700; font-family: var(--font-mono); background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.statLabel { font-size: 0.82rem; color: var(--text2); }
+
+/* Visual */
+.heroVisual {
+  position: relative;
+  flex: 1;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb1 {
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: float 6s ease-in-out infinite;
+}
+.orb2 {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%);
+  top: 30%; left: 60%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.floatCard {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 14px 18px;
+  animation: float 5s ease-in-out infinite;
+  min-width: 200px;
+  top: 15%; left: 5%;
+}
+.floatCard2 { top: 45%; left: 55%; animation-delay: 1.5s; animation-duration: 6s; }
+.floatCard3 { top: 72%; left: 10%; animation-delay: 3s; animation-duration: 7s; }
+
+.floatCardIcon { font-size: 1.8rem; }
+.floatCardTitle { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.floatCardSub { font-size: 0.78rem; color: var(--text2); font-family: var(--font-mono); margin-top: 2px; }
+
+/* Sections */
+.section { padding: 90px 0; }
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+.stepCard { padding: 28px; position: relative; overflow: hidden; }
+.stepNum { font-size: 3rem; font-weight: 700; font-family: var(--font-mono); color: var(--border); position: absolute; top: 16px; right: 20px; line-height: 1; }
+.stepIcon { font-size: 2rem; margin-bottom: 14px; }
+.stepTitle { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+.stepDesc { font-size: 0.88rem; color: var(--text2); line-height: 1.6; }
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+.featureCard { padding: 28px; }
+.featureIcon { font-size: 2rem; margin-bottom: 14px; }
+.featureTitle { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+.featureDesc { font-size: 0.88rem; color: var(--text2); line-height: 1.6; }
+
+/* CTA Banner */
+.ctaBanner {
+  padding: 90px 24px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(6,182,212,0.05) 100%);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .heroVisual { display: none; }
+  .hero { padding: 100px 24px 60px; }
+}
+@media (max-width: 600px) {
+  .stats { gap: 20px; }
+  .heroCta { flex-direction: column; }
+}

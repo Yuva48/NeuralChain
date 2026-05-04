@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1777624233966",
+    "username": "Suraj",
+    "email": "qqqwww5556678@gmail.com",
+    "password": "$2a$10$87IBTPTdXuJ9N136cHUYV.rLNjJMnoiT8kwkZCZCwxe8IJX5TTbui",
+    "walletAddress": null,
+    "createdAt": "2026-05-01T08:30:33.966Z"
+  },
+  {
+    "id": "1777873522764",
+    "username": "Sushanth",
+    "email": "asushanthrahul@gmail.com",
+    "password": "$2a$10$jX2bUthzy3qG6MVkU7rJb./u1swW/ZlWCylzhLoXM377EBR64Gtq.",
+    "walletAddress": null,
+    "createdAt": "2026-05-04T05:45:22.764Z"
+  }
+]

@@ -1,0 +1,67 @@
+.form { display: flex; flex-direction: column; gap: 20px; }
+
+.dropZone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.02);
+}
+.dropZone:hover, .dropZoneActive {
+  border-color: var(--purple);
+  background: var(--purple-dim);
+}
+
+.dropPrompt { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text2); }
+.dropPrompt strong { color: var(--text); }
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+}
+.fileIcon { font-size: 2rem; }
+.fileName { font-weight: 600; color: var(--text); text-align: left; }
+.fileSize { font-size: 0.82rem; color: var(--text2); }
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.progressBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--purple-dim);
+  border: 1px solid rgba(124,58,237,0.3);
+  border-radius: var(--radius-sm);
+  color: var(--purple-light);
+  font-size: 0.92rem;
+}
+
+/* Success */
+.successBox {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: left;
+}
+.successRow {
+  display: flex;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: var(--text2);
+  flex-wrap: wrap;
+}
+.mono { font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan-light); word-break: break-all; }
+
+@media (max-width: 600px) {
+  .grid2 { grid-template-columns: 1fr; }
+}

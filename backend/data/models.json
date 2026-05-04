@@ -1,0 +1,172 @@
+[
+  {
+    "id": "demo-1",
+    "name": "ResNet-50 Image Classifier",
+    "description": "A powerful image classification model trained on ImageNet with 50 layers. Achieves 76% top-1 accuracy. Perfect for object recognition tasks.",
+    "category": "Computer Vision",
+    "ipfsHash": "QmDemo1ResNet50ClassifierModel",
+    "price": 0.05,
+    "owner": {
+      "id": "demo-owner",
+      "username": "AIResearcher",
+      "email": "researcher@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [
+      "1777624233966"
+    ],
+    "createdAt": "2024-01-10T10:00:00.000Z",
+    "downloads": 143,
+    "rating": "4.8",
+    "tags": [
+      "CNN",
+      "ImageNet",
+      "Classification"
+    ]
+  },
+  {
+    "id": "demo-2",
+    "name": "GPT-2 Fine-tuned (Medical)",
+    "description": "GPT-2 fine-tuned on medical literature for generating clinical summaries and answering medical queries. Great for healthcare NLP applications.",
+    "category": "NLP",
+    "ipfsHash": "QmDemo2GPT2MedicalFinetunedModel",
+    "price": 0.1,
+    "owner": {
+      "id": "demo-owner-2",
+      "username": "MedAI_Labs",
+      "email": "labs@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [],
+    "createdAt": "2024-01-15T14:30:00.000Z",
+    "downloads": 89,
+    "rating": "4.6",
+    "tags": [
+      "NLP",
+      "Healthcare",
+      "GPT-2"
+    ]
+  },
+  {
+    "id": "demo-3",
+    "name": "YOLOv8 Object Detection",
+    "description": "State-of-the-art real-time object detection model. Can detect 80 classes at 60+ FPS. Optimized for edge deployment.",
+    "category": "Computer Vision",
+    "ipfsHash": "QmDemo3YOLOv8ObjectDetectionModel",
+    "price": 0.08,
+    "owner": {
+      "id": "demo-owner-3",
+      "username": "VisionTech",
+      "email": "vision@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [],
+    "createdAt": "2024-01-20T09:15:00.000Z",
+    "downloads": 215,
+    "rating": "4.9",
+    "tags": [
+      "YOLO",
+      "Detection",
+      "Real-time"
+    ]
+  },
+  {
+    "id": "demo-4",
+    "name": "Sentiment Analysis BERT",
+    "description": "BERT-based sentiment analysis model fine-tuned on 500k product reviews. Supports positive/negative/neutral classification with confidence scores.",
+    "category": "NLP",
+    "ipfsHash": "QmDemo4BERTSentimentAnalysisModel",
+    "price": 0,
+    "owner": {
+      "id": "demo-owner-4",
+      "username": "NLPOpen",
+      "email": "open@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [],
+    "createdAt": "2024-01-25T16:00:00.000Z",
+    "downloads": 501,
+    "rating": "4.7",
+    "tags": [
+      "BERT",
+      "Sentiment",
+      "Free"
+    ]
+  },
+  {
+    "id": "demo-5",
+    "name": "Stable Diffusion v1.5 Lite",
+    "description": "Lightweight version of Stable Diffusion optimized for consumer GPUs. Generates 512x512 images in under 10 seconds.",
+    "category": "Generative AI",
+    "ipfsHash": "QmDemo5StableDiffusionLiteModel",
+    "price": 0.15,
+    "owner": {
+      "id": "demo-owner-5",
+      "username": "GenAI_Studio",
+      "email": "studio@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [],
+    "createdAt": "2024-02-01T11:00:00.000Z",
+    "downloads": 330,
+    "rating": "4.5",
+    "tags": [
+      "Diffusion",
+      "Image Generation",
+      "Art"
+    ]
+  },
+  {
+    "id": "demo-6",
+    "name": "Time Series Forecasting LSTM",
+    "description": "LSTM-based model for multivariate time series forecasting. Trained on financial data. Supports up to 30-day horizon prediction.",
+    "category": "Finance",
+    "ipfsHash": "QmDemo6LSTMTimeSeriesModel",
+    "price": 0.12,
+    "owner": {
+      "id": "demo-owner-6",
+      "username": "QuantML",
+      "email": "quant@demo.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [],
+    "createdAt": "2024-02-05T08:00:00.000Z",
+    "downloads": 78,
+    "rating": "4.3",
+    "tags": [
+      "LSTM",
+      "Finance",
+      "Forecasting"
+    ]
+  },
+  {
+    "id": "1777873451140",
+    "name": "sdfdsfdf",
+    "description": "rwrwerr",
+    "category": "General",
+    "ipfsHash": "QmMwEpEuputaMFppHSHipmxSKf4bRy1KKAqaGucyisVdP",
+    "price": 0.05,
+    "owner": {
+      "id": "1777624233966",
+      "username": "Suraj",
+      "email": "qqqwww5556678@gmail.com"
+    },
+    "txHash": null,
+    "contractModelId": null,
+    "purchases": [
+      "1777873522764"
+    ],
+    "createdAt": "2026-05-04T05:44:11.140Z",
+    "downloads": 1,
+    "rating": "4.9",
+    "tags": [
+      "html"
+    ]
+  }
+]
