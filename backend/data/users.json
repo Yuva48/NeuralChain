@@ -5,6 +5,8 @@
     "email": "qqqwww5556678@gmail.com",
     "password": "$2a$10$87IBTPTdXuJ9N136cHUYV.rLNjJMnoiT8kwkZCZCwxe8IJX5TTbui",
     "walletAddress": null,
+    "role": "buyer",
+    "isSellerVerified": false,
     "createdAt": "2026-05-01T08:30:33.966Z"
   },
   {
@@ -13,6 +15,50 @@
     "email": "asushanthrahul@gmail.com",
     "password": "$2a$10$jX2bUthzy3qG6MVkU7rJb./u1swW/ZlWCylzhLoXM377EBR64Gtq.",
     "walletAddress": null,
+    "role": "buyer",
+    "isSellerVerified": false,
     "createdAt": "2026-05-04T05:45:22.764Z"
+  },
+  {
+    "id": "1778129976980",
+    "username": "Suraj",
+    "email": "random123@gmail.com",
+    "password": "$2a$10$Zf/Cj.q8TAkZ9pmbshS8ou7FuGslJFvVC2Brv7J9iHlt2ABFbk2Jm",
+    "walletAddress": null,
+    "role": "buyer",
+    "isSellerVerified": false,
+    "createdAt": "2026-05-07T04:59:36.980Z"
+  },
+  {
+    "id": "1778138613698",
+    "username": "1234555",
+    "email": "123@123",
+    "password": "$2a$10$YFJ6TZeE7myjFLdB7ptw9udHw3jMN/m5TUUAcNh78H3J/ckoUsS8C",
+    "walletAddress": null,
+    "createdAt": "2026-05-07T07:23:33.698Z"
+  },
+  {
+    "id": "1778217997652",
+    "username": "ss12313233",
+    "email": "asas123@gmail.com",
+    "password": "$2a$10$LmOo/u0pUhRyAowmL6jrmu0lW/1GzUPj4bVjlUaJKI62ixM99vkj2",
+    "walletAddress": null,
+    "createdAt": "2026-05-08T05:26:37.652Z"
+  },
+  {
+    "id": "1778218604494",
+    "username": "snsn211123123",
+    "email": "alma123@gmail.com",
+    "password": "$2a$10$juvNbyFALwEUwJ5XR33SbO8MCpzlBy3REah6o/s6lx3EoXIu8SQku",
+    "walletAddress": null,
+    "createdAt": "2026-05-08T05:36:44.494Z"
+  },
+  {
+    "id": "1779296336924",
+    "username": "utyututut",
+    "email": "surajnt18@gmail.com",
+    "password": "$2a$10$3KezhuqJBf5GWPQowoNE8eEoRVWvC77Px1BGD0vxbxfDUQXNGjasC",
+    "walletAddress": null,
+    "createdAt": "2026-05-20T16:58:56.924Z"
   }
 ]

@@ -13,9 +13,23 @@ export default function Login() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const validateEmail = (email) => {
+    if (!email.trim()) return "Email is required.";
+    if (!email.toLowerCase().endsWith("@gmail.com"))
+      return "Email must be a valid Gmail address (e.g. yourname@gmail.com).";
+    const localPart = email.split("@")[0];
+    if (!/[a-zA-Z]/.test(localPart))
+      return "Email local part must contain letters, not only numbers (e.g. user123@gmail.com).";
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    const emailErr = validateEmail(form.email);
+    if (emailErr) { setError(emailErr); return; }
+
     setLoading(true);
     try {
       const res = await loginApi(form);
@@ -31,11 +45,17 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        {/* Header */}
         <div className={styles.header}>
+          <div className={styles.eyebrow}>NeuralChain access</div>
           <div className={styles.logo}>⛓️</div>
-          <h1 className={styles.title}>Welcome Back</h1>
-          <p className={styles.sub}>Sign in to your AIModelChain account</p>
+          <h1 className={styles.title}>Welcome back</h1>
+          <p className={styles.sub}>Secure access to verified AI models and creator tools.</p>
+        </div>
+
+        <div className={styles.trustRow}>
+          <span>Verified access</span>
+          <span>Web3 ready</span>
+          <span>Creator portal</span>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -43,8 +63,11 @@ export default function Login() {
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email Address</label>
-            <input id="email" name="email" type="email" className="form-input"
-              placeholder="you@example.com" value={form.email} onChange={handleChange} required />
+            <input id="email" name="email" type="text" className="form-input"
+              placeholder="yourname@gmail.com" value={form.email} onChange={handleChange} required />
+            <small style={{ color: "#a0aec0", fontSize: "0.78rem", marginTop: 4, display: "block" }}>
+              Must be a Gmail address with letters (e.g. user123@gmail.com)
+            </small>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="password">Password</label>

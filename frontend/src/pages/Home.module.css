@@ -1,149 +1,543 @@
+/* ─── Hero Section ────────────────────────────────────────────────────────── */
+
 .hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 100px 24px 80px;
-  overflow: hidden;
+    position: relative;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 6rem 2rem;
+    overflow: hidden;
 }
 
 .heroBg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 60% 50%, rgba(124,58,237,0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(6,182,212,0.08) 0%, transparent 60%);
-  pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient( 600px at 20% 50%, rgba(123, 94, 167, 0.15) 0%, transparent 80%), radial-gradient( 600px at 80% 80%, rgba(0, 245, 196, 0.1) 0%, transparent 80%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .heroContent {
-  position: relative;
-  z-index: 2;
-  max-width: 580px;
-  flex: 1;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.heroBadge { margin-bottom: 20px; display: inline-flex; }
+.heroBadge {
+    align-self: flex-start;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem !important;
+    display: inline-flex;
+    margin-bottom: 0.5rem;
+}
 
 .heroTitle {
-  font-size: clamp(2.4rem, 5vw, 4rem);
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 20px;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
 }
 
 .heroDesc {
-  font-size: 1.1rem;
-  color: var(--text2);
-  line-height: 1.7;
-  max-width: 480px;
-  margin-bottom: 36px;
+    font-size: 1.125rem;
+    color: var(--text2);
+    max-width: 500px;
+    line-height: 1.8;
+    margin-bottom: 1rem;
 }
 
-.heroCta {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 48px;
+.trustPills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0.25rem 0 0.5rem;
 }
 
-/* Stats */
+.trustPill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 245, 196, 0.18);
+    background: rgba(0, 245, 196, 0.05);
+    color: var(--cyan-light);
+    padding: 0.5rem 0.8rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.heroSearch {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.heroSearch input {
+    flex: 1;
+    min-height: 50px;
+    font-size: 1rem;
+}
+
+.heroCtas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
 .stats {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
 }
-.stat { display: flex; flex-direction: column; gap: 2px; }
-.statValue { font-size: 1.5rem; font-weight: 700; font-family: var(--font-mono); background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.statLabel { font-size: 0.82rem; color: var(--text2); }
 
-/* Visual */
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.statValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.statLabel {
+    font-size: 0.85rem;
+    color: var(--text2);
+}
+
 .heroVisual {
-  position: relative;
-  flex: 1;
-  height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
 }
 
-.orb1 {
-  position: absolute;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  animation: float 6s ease-in-out infinite;
-}
-.orb2 {
-  position: absolute;
-  width: 200px; height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%);
-  top: 30%; left: 60%;
-  animation: float 8s ease-in-out infinite reverse;
+.heroPanel {
+    position: relative;
+    z-index: 3;
+    width: min(100%, 360px);
+    padding: 1.5rem;
+    background: rgba(5, 11, 20, 0.8) !important;
+    border: 1px solid rgba(0, 245, 196, 0.18) !important;
+    box-shadow: 0 24px 60px rgba(16, 185, 129, 0.12);
 }
 
-.floatCard {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(12px);
-  border-radius: 14px;
-  padding: 14px 18px;
-  animation: float 5s ease-in-out infinite;
-  min-width: 200px;
-  top: 15%; left: 5%;
-}
-.floatCard2 { top: 45%; left: 55%; animation-delay: 1.5s; animation-duration: 6s; }
-.floatCard3 { top: 72%; left: 10%; animation-delay: 3s; animation-duration: 7s; }
-
-.floatCardIcon { font-size: 1.8rem; }
-.floatCardTitle { font-size: 0.88rem; font-weight: 600; color: var(--text); }
-.floatCardSub { font-size: 0.78rem; color: var(--text2); font-family: var(--font-mono); margin-top: 2px; }
-
-/* Sections */
-.section { padding: 90px 0; }
-
-.stepsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 24px;
-}
-.stepCard { padding: 28px; position: relative; overflow: hidden; }
-.stepNum { font-size: 3rem; font-weight: 700; font-family: var(--font-mono); color: var(--border); position: absolute; top: 16px; right: 20px; line-height: 1; }
-.stepIcon { font-size: 2rem; margin-bottom: 14px; }
-.stepTitle { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
-.stepDesc { font-size: 0.88rem; color: var(--text2); line-height: 1.6; }
-
-.featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-.featureCard { padding: 28px; }
-.featureIcon { font-size: 2rem; margin-bottom: 14px; }
-.featureTitle { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
-.featureDesc { font-size: 0.88rem; color: var(--text2); line-height: 1.6; }
-
-/* CTA Banner */
-.ctaBanner {
-  padding: 90px 24px;
-  background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(6,182,212,0.05) 100%);
-  border-top: 1px solid var(--border);
+.panelBadge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--cyan-light);
+    background: rgba(0, 245, 196, 0.08);
+    border: 1px solid rgba(0, 245, 196, 0.18);
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
 }
 
-@media (max-width: 900px) {
-  .heroVisual { display: none; }
-  .hero { padding: 100px 24px 60px; }
+.panelHeadline {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 1rem 0 1.4rem;
 }
-@media (max-width: 600px) {
-  .stats { gap: 20px; }
-  .heroCta { flex-direction: column; }
+
+.panelGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    gap: 0.9rem;
+}
+
+.panelGrid div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.9rem 0.8rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+}
+
+.panelLabel {
+    color: var(--text2);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.panelGrid strong {
+    font-size: 1.05rem;
+    color: var(--white);
+}
+
+.graphicCard {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    min-width: 140px;
+    text-align: center;
+}
+
+.graphicCard:nth-child(1) {
+    transform: translate(-80px, -60px);
+}
+
+.graphicCard:nth-child(2) {
+    transform: translate(0, 80px);
+}
+
+.graphicCard:nth-child(3) {
+    transform: translate(80px, -60px);
+}
+
+.graphicIcon {
+    font-size: 3rem;
+}
+
+.graphicCard p {
+    font-size: 0.85rem;
+    color: var(--text2);
+}
+
+
+/* ─── Sections ────────────────────────────────────────────────────────────── */
+
+.section {
+    padding: 6rem 2rem;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.sectionHeader h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+}
+
+.sectionTitle {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+
+/* ─── Model Cards ─────────────────────────────────────────────────────────── */
+
+.modelCard {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem !important;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+}
+
+.modelCard:hover {
+    transform: translateY(-8px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cardIcon {
+    font-size: 2.5rem;
+}
+
+.cardCategory {
+    font-size: 0.75rem;
+    background: rgba(0, 245, 196, 0.1);
+    color: var(--cyan);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 245, 196, 0.2);
+}
+
+.cardTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.cardCreator {
+    font-size: 0.875rem;
+    color: var(--text2);
+}
+
+.cardMetrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.metricLabel {
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-transform: uppercase;
+}
+
+.metricValue {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.cardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.price {
+    font-weight: 700;
+    font-size: 1.125rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+
+/* ─── Creator Cards ───────────────────────────────────────────────────────── */
+
+.creatorCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 2rem 1.5rem !important;
+}
+
+.creatorAvatar {
+    font-size: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.creatorName {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.creatorStats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.creatorStat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.statNum {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.statName {
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-transform: uppercase;
+}
+
+.creatorEarnings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+
+.earningsLabel {
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-transform: uppercase;
+}
+
+.earningsValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+
+/* ─── Feature Cards ───────────────────────────────────────────────────────── */
+
+.featureCard {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem 1.5rem !important;
+    text-align: center;
+}
+
+.featureIcon {
+    font-size: 2.5rem;
+    margin: 0 auto;
+}
+
+.featureTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.featureDesc {
+    font-size: 0.95rem;
+    color: var(--text2);
+    line-height: 1.6;
+}
+
+
+/* ─── CTA Section ─────────────────────────────────────────────────────────── */
+
+.ctaSection {
+    padding: 6rem 2rem;
+}
+
+.ctaContent {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4rem 2rem !important;
+    background: rgba(0, 245, 196, 0.05) !important;
+}
+
+.ctaContent h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.ctaContent p {
+    font-size: 1.125rem;
+    color: var(--text2);
+    margin-bottom: 2rem;
+}
+
+.ctaButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+    .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        gap: 3rem;
+    }
+    .heroVisual {
+        order: -1;
+    }
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 3rem 1rem;
+        gap: 2rem;
+    }
+    .heroTitle {
+        font-size: 1.75rem;
+    }
+    .heroDesc {
+        font-size: 1rem;
+    }
+    .heroSearch {
+        flex-direction: column;
+    }
+    .heroSearch input {
+        width: 100%;
+    }
+    .heroCtas {
+        flex-direction: column;
+    }
+    .heroCtas a {
+        width: 100%;
+    }
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    .section {
+        padding: 3rem 1rem;
+    }
+    .sectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .graphicCard:nth-child(1) {
+        transform: translate(-40px, -30px);
+    }
+    .graphicCard:nth-child(2) {
+        transform: translate(0, 40px);
+    }
+    .graphicCard:nth-child(3) {
+        transform: translate(40px, -30px);
+    }
+    .graphicIcon {
+        font-size: 2rem;
+    }
+    .ctaContent {
+        padding: 2rem 1rem !important;
+    }
+    .ctaButtons {
+        flex-direction: column;
+    }
+    .ctaButtons a {
+        width: 100%;
+    }
 }

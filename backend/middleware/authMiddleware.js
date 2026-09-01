@@ -17,4 +17,20 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret");
+      req.user = decoded;
+    } catch (err) {
+      // Ignored for optional auth
+    }
+  }
+  next();
+};
+
 module.exports = authMiddleware;
+module.exports.optionalAuth = optionalAuth;

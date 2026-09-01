@@ -1,111 +1,312 @@
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text2);
-  font-size: 0.9rem;
-  margin-bottom: 28px;
-  transition: color 0.2s;
-}
-.back:hover { color: var(--purple-light); }
-
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 32px;
-  align-items: start;
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+    text-decoration: none;
 }
 
-.main { display: flex; flex-direction: column; gap: 0; }
-
-.titleRow {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-.iconBig {
-  font-size: 3rem;
-  width: 72px; height: 72px;
-  background: var(--purple-dim);
-  border: 1px solid rgba(124,58,237,0.3);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.title { font-size: 1.8rem; font-weight: 700; line-height: 1.2; }
-.ownerLine { color: var(--text2); font-size: 0.9rem; margin-top: 4px; }
-
-.description {
-  color: var(--text2);
-  line-height: 1.8;
-  font-size: 0.98rem;
+.backLink:hover {
+    color: var(--cyan);
 }
 
-.tag {
-  padding: 4px 12px;
-  border-radius: 100px;
-  font-size: 0.8rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  color: var(--text3);
+/* Header Section */
+.header {
+    background: rgba(14, 18, 28, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 245, 196, 0.15);
+    border-radius: var(--radius);
+    padding: 2.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-.statsRow {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  padding: 20px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  margin: 20px 0;
-}
-.statItem {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--text2);
-  font-size: 0.9rem;
+.headerContent {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.ipfsBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
+.headerIcon {
+    font-size: 3.5rem;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 245, 196, 0.08);
+    border: 1px solid rgba(0, 245, 196, 0.25);
+    border-radius: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(0, 245, 196, 0.1);
 }
-.ipfsLabel { font-size: 0.82rem; color: var(--text2); white-space: nowrap; }
-.ipfsHash { font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan-light); word-break: break-all; }
 
-/* Sidebar */
-.sidebar { position: sticky; top: 90px; }
+.headerInfo {
+    flex: 1;
+    min-width: 300px;
+}
 
-.purchaseCard {
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.02em;
+}
+
+.creator {
+    color: var(--text2);
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.rating {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: var(--text2);
+}
+
+/* Price & Action Card */
+.priceActionBox {
+    min-width: 260px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: stretch;
 }
 
 .priceDisplay {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
-.ethSym { font-size: 1.8rem; color: var(--amber); font-family: var(--font-mono); font-weight: 700; }
-.priceNum { font-size: 2.8rem; font-weight: 700; color: var(--amber); font-family: var(--font-mono); }
-.ethLabel { font-size: 1rem; color: var(--text2); }
+
+.ethPrice {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--cyan);
+    font-family: var(--font-mono);
+}
+
+.neuralPrice {
+    font-size: 0.85rem;
+    color: var(--purple-light);
+    font-weight: 600;
+}
+
+.buyButton {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 0 20px rgba(0, 245, 196, 0.3);
+}
+
+/* Highlight Bar */
+.highlightStrip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.highlightCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(14, 18, 28, 0.6);
+    backdrop-filter: blur(12px);
+}
+
+.highlightCard span {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    font-weight: 600;
+}
+
+.highlightCard strong {
+    font-size: 1.05rem;
+    color: var(--cyan);
+}
+
+/* Tabs */
+.tabsContainer {
+    margin-bottom: 1.5rem;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.tabActive {
+    color: var(--cyan) !important;
+    background: rgba(0, 245, 196, 0.08) !important;
+    border: 1px solid rgba(0, 245, 196, 0.25) !important;
+}
+
+.tabContentArea {
+    margin-bottom: 3rem;
+}
+
+/* Spec Grid */
+.specGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.specItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.specItem label {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.specItem span {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.codeSnippet {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--cyan);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 10px;
+    border-radius: 6px;
+    word-break: break-all;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Sandbox */
+.sandboxResultBox {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 245, 196, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+.jsonPreview {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #a7f3d0;
+    margin: 0;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+
+/* Benchmarks */
+.benchmarkCard {
+    background: rgba(0, 245, 196, 0.04);
+    border: 1px solid rgba(0, 245, 196, 0.12);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.benchmarkLabel {
+    font-size: 0.75rem;
+    color: var(--text3);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.benchmarkVal {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--cyan);
+    font-family: var(--font-mono);
+}
+
+/* Code Block */
+.codeBlock {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text);
+    overflow-x: auto;
+    line-height: 1.6;
+}
+
+/* Reviews */
+.reviewCard {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
-}
-@media (max-width: 600px) {
-  .titleRow { flex-direction: column; }
-  .title { font-size: 1.4rem; }
+    .headerContent {
+        flex-direction: column;
+    }
+    .priceActionBox {
+        width: 100%;
+    }
+    .specGrid {
+        grid-template-columns: 1fr;
+    }
 }

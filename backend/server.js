@@ -1,48 +1,108 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
+const { connectDB } = require("./config/db");
 const authRoutes = require("./routes/auth");
 const modelsRoutes = require("./routes/models");
 const ipfsRoutes = require("./routes/ipfs");
+const governanceRoutes = require("./routes/governance");
+const leaderboardRoutes = require("./routes/leaderboard");
+const dashboardRoutes = require("./routes/dashboard");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:4173",
+    ...(process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean),
+];
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost:4173"],
-  credentials: true,
+const sanitizeInput = (value) => {
+    if (Array.isArray(value)) return value.map((entry) => sanitizeInput(entry));
+    if (value && typeof value === "object") {
+        return Object.fromEntries(
+            Object.entries(value).map(([key, entry]) => [key, sanitizeInput(entry)])
+        );
+    }
+    if (typeof value === "string") return value.trim();
+    return value;
+};
+
+app.set("trust proxy", 1);
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: false,
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests. Please slow down and try again later." },
+}));
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+}));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use((req, res, next) => {
+    if (req.body && typeof req.body === "object") {
+        req.body = sanitizeInput(req.body);
+    }
+    next();
+});
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/models", modelsRoutes);
 app.use("/api/ipfs", ipfsRoutes);
+app.use("/api/governance", governanceRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({
-    status: "OK",
-    message: "AI Model Marketplace API is running 🚀",
-    timestamp: new Date().toISOString(),
-  });
+    res.json({
+        status: "OK",
+        message: "AI Model Marketplace API is running 🚀",
+        timestamp: new Date().toISOString(),
+    });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err.message);
-  res.status(500).json({ error: "Internal server error" });
+    console.error("Server Error:", err.message);
+
+    if (err.message === "Not allowed by CORS") {
+        return res.status(403).json({ error: "Origin not allowed." });
+    }
+
+    res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend running at http://localhost:${PORT}`);
-  console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+// Start server with MongoDB connection
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Backend running at http://localhost:${PORT}`);
+        console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+    });
+}).catch((error) => {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
 });

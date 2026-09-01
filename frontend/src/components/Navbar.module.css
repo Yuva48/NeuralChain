@@ -1,138 +1,306 @@
 .nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 0 24px;
-  height: 68px;
-  display: flex;
-  align-items: center;
-  transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
-  border-bottom: 1px solid transparent;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 24px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(10, 13, 20, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .scrolled {
-  background: rgba(7, 7, 26, 0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+    background: rgba(7, 10, 18, 0.92);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(0, 245, 196, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .inner {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 32px;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 28px;
 }
 
 .logo {
-  font-size: 1.25rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    border-radius: 12px;
+    letter-spacing: -0.02em;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.logoIcon { font-size: 1.4rem; }
-.logoAccent { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+.logoIcon {
+    font-size: 1.3rem;
+    color: var(--cyan);
+    filter: drop-shadow(0 0 8px rgba(0, 245, 196, 0.6));
+}
+
+.logoAccent {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
 .links {
-  display: flex;
-  list-style: none;
-  gap: 8px;
-  flex: 1;
+    display: flex;
+    list-style: none;
+    gap: 6px;
+    flex: 1;
 }
 
 .link {
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  color: var(--text2);
-  font-weight: 500;
-  font-size: 0.92rem;
-  transition: all 0.2s;
+    padding: 8px 14px;
+    border-radius: 10px;
+    color: var(--text2);
+    font-weight: 500;
+    font-size: 0.92rem;
+    transition: all 0.2s ease;
 }
-.link:hover { color: var(--text); background: var(--card); }
-.active { color: var(--purple-light) !important; background: var(--purple-dim) !important; }
+
+.link:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.active {
+    color: var(--cyan) !important;
+    background: rgba(0, 245, 196, 0.08) !important;
+    border: 1px solid rgba(0, 245, 196, 0.2);
+}
 
 .right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    position: relative;
 }
 
-.walletConnected {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(16,185,129,0.1);
-  border: 1px solid rgba(16,185,129,0.3);
-  border-radius: 100px;
-  padding: 6px 14px;
+/* Wallet Pill & Dropdown */
+.walletContainer {
+    position: relative;
 }
-.walletDot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse-glow 2s infinite; }
-.walletAddr { font-family: var(--font-mono); font-size: 0.82rem; color: #34d399; }
 
-.walletBtn { border-radius: 100px !important; }
+.walletPill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 245, 196, 0.06);
+    border: 1px solid rgba(0, 245, 196, 0.25);
+    border-radius: 100px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text);
+}
 
-.userMenu { display: flex; align-items: center; gap: 10px; }
-.userName { font-size: 0.9rem; color: var(--text2); font-weight: 500; }
-.authBtns { display: flex; gap: 8px; }
+.walletPill:hover {
+    background: rgba(0, 245, 196, 0.12);
+    border-color: rgba(0, 245, 196, 0.4);
+    box-shadow: 0 0 15px rgba(0, 245, 196, 0.15);
+}
 
-/* Hamburger */
+.walletDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; }
+}
+
+.walletLabel {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.walletAddr {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--cyan);
+    background: rgba(0, 245, 196, 0.1);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.walletDropdownArrow {
+    font-size: 0.75rem;
+    color: var(--text3);
+}
+
+.walletDropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: rgba(14, 18, 28, 0.96);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 245, 196, 0.25);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 196, 0.1);
+    animation: slideDown 0.2s ease-out;
+    z-index: 1001;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.walletDropdownHeader {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 12px;
+}
+
+.dropdownAddress {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text2);
+    word-break: break-all;
+    margin-top: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.walletBalances {
+    display: grid;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 14px;
+}
+
+.balanceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.walletActions {
+    display: grid;
+    gap: 8px;
+}
+
+.connectButtonsGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.glowBtn {
+    box-shadow: 0 0 14px rgba(0, 245, 196, 0.2);
+    border-color: rgba(0, 245, 196, 0.3) !important;
+}
+
+.glowBtn:hover {
+    box-shadow: 0 0 20px rgba(0, 245, 196, 0.4);
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.userName {
+    font-size: 0.9rem;
+    color: var(--text2);
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.userName:hover {
+    color: var(--cyan);
+}
+
+.authBtns {
+    display: flex;
+    gap: 8px;
+}
+
 .hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
 }
+
 .bar {
-  width: 22px;
-  height: 2px;
-  background: var(--text2);
-  border-radius: 2px;
-  transition: all 0.3s;
-  display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text2);
+    border-radius: 2px;
+    transition: all 0.3s;
+    display: block;
 }
 
-/* Mobile Menu */
 .mobileMenu {
-  position: fixed;
-  top: 68px;
-  left: 0; right: 0;
-  background: rgba(7,7,26,0.97);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 12px 24px 24px;
-  gap: 4px;
-  z-index: 99;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(10, 13, 20, 0.98);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(0, 245, 196, 0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    gap: 6px;
+    z-index: 999;
 }
-.mobileLink {
-  display: block;
-  padding: 14px 16px;
-  color: var(--text2);
-  font-size: 1rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: none;
-  text-align: left;
-  width: 100%;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.mobileLink:hover { background: var(--card); color: var(--text); }
 
-@media (max-width: 768px) {
-  .links { display: none; }
-  .authBtns { display: none; }
-  .userMenu .btn { display: none; }
-  .userName { display: none; }
-  .walletConnected { display: none; }
-  .walletBtn { display: none; }
-  .hamburger { display: flex; }
+.mobileLink {
+    display: block;
+    padding: 12px 16px;
+    color: var(--text2);
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.mobileLink:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--cyan);
+}
+
+@media (max-width: 900px) {
+    .links {
+        display: none;
+    }
+    .hamburger {
+        display: flex;
+    }
 }

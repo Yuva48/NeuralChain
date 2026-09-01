@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { uploadToIPFS, createModel } from "../services/api";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { uploadToIPFS, createModel, createModelVersion, getModel } from "../services/api";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useWeb3 } from "../context/Web3Context.jsx";
 import styles from "./Upload.module.css";
@@ -9,14 +9,33 @@ const CATEGORIES = ["Computer Vision", "NLP", "Generative AI", "Finance", "Audio
 
 export default function Upload() {
   const { user } = useAuth();
-  const { account, signer, connectWallet } = useWeb3();
+  const { account, signer, connectWallet, demoMode, addTransaction } = useWeb3();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const parentModelId = searchParams.get("parentModelId");
 
-  const [form, setForm] = useState({ name: "", description: "", category: "General", price: "0.05", tags: "" });
+  const [form, setForm] = useState({ name: "", description: "", category: "General", price: "0.05", tags: "", version: "1.0", versionNotes: "" });
+  const [parentModel, setParentModel] = useState(null);
   const [file, setFile] = useState(null);
   const [step, setStep] = useState("idle"); // idle | uploading-ipfs | uploading-chain | done
   const [error, setError] = useState(null);
   const [ipfsResult, setIpfsResult] = useState(null);
+
+  useEffect(() => {
+    if (!parentModelId) return;
+    getModel(parentModelId).then((res) => {
+      const source = res.data;
+      setParentModel(source);
+      setForm((current) => ({
+        ...current,
+        name: source.name,
+        description: source.description,
+        category: source.category,
+        price: String(source.price ?? current.price),
+        tags: (source.tags || []).join(", "),
+      }));
+    }).catch(() => setError("The parent model version could not be loaded."));
+  }, [parentModelId]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -34,23 +53,64 @@ export default function Upload() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) { setError("Please select a file to upload."); return; }
+    if (!account && !demoMode) { setError("Connect MetaMask before uploading a model or use Demo Wallet."); return; }
+    // Basic validation
+    const maxBytes = 100 * 1024 * 1024; // 100MB
+    if (file.size > maxBytes) { setError("File is too large. Max 100MB."); return; }
+    const allowed = [".pkl", ".pt", ".h5", ".onnx", ".zip", ".tar.gz"];
+    const nameLower = file.name.toLowerCase();
+    if (!allowed.some(ext => nameLower.endsWith(ext))) {
+      // allow unknown extensions but warn
+      console.warn("Uploading file with uncommon extension", file.name);
+    }
     setError(null);
 
     try {
-      // Step 1: Upload to IPFS
+      // Step 1: Upload to IPFS (try real upload, but fallback in demo mode)
       setStep("uploading-ipfs");
-      const fd = new FormData();
-      fd.append("file", file);
-      const ipfsRes = await uploadToIPFS(fd);
-      const { ipfsHash, demoMode } = ipfsRes.data;
-      setIpfsResult(ipfsRes.data);
+      let ipfsHash = null;
+      let verification = null;
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const ipfsRes = await uploadToIPFS(fd);
+        ipfsHash = ipfsRes.data?.ipfsHash;
+        verification = ipfsRes.data?.verification;
+        if (!ipfsHash) throw new Error(ipfsRes.data?.error || "IPFS upload failed: No valid CID returned.");
+        setIpfsResult(ipfsRes.data);
+      } catch (ipfsErr) {
+        console.error("IPFS upload error:", ipfsErr);
+        if (demoMode) {
+          // Simulate an IPFS CID and verification for demo flows
+          ipfsHash = `bafybeigdemo${Math.random().toString(36).slice(2, 10)}`;
+          verification = {
+            verificationStatus: "demo",
+            verificationScore: 100,
+            modelHash: Math.random().toString(36).slice(2, 18),
+            framework: "demo",
+            modelFormat: "zip",
+            checks: [],
+            warnings: [],
+          };
+          setIpfsResult({ ipfsHash, verification });
+        } else {
+          throw new Error(ipfsErr.response?.data?.error || ipfsErr.message || "IPFS upload failed.");
+        }
+      }
 
-      // Step 2: (Optional) Record on blockchain
+      // Step 2: (Optional) Record on blockchain or simulate in demo mode
       setStep("uploading-chain");
       let txHash = null;
       let contractModelId = null;
 
-      if (account && signer && !demoMode) {
+      if (demoMode) {
+        // Simulate quick tx confirmation for demo users
+        await new Promise((r) => setTimeout(r, 800));
+        txHash = `0xdemo${Math.random().toString(36).slice(2, 58)}`;
+        contractModelId = String(Math.floor(Math.random() * 1000000));
+        // Record a demo transaction in tx history
+        addTransaction({ hash: txHash, status: "demo", type: "upload", modelId: contractModelId, modelName: form.name, valueEth: 0, chainId: null, from: account || "demo" });
+      } else if (account && signer) {
         try {
           const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
           const zeroAddr = "0x0000000000000000000000000000000000000000";
@@ -60,19 +120,37 @@ export default function Upload() {
             if (contractData) {
               const contract = new ethers.Contract(contractAddress, contractData.default.abi, signer);
               const priceWei = ethers.parseEther(form.price || "0");
-              const tx = await contract.uploadModel(form.name, form.description, form.category, ipfsHash, priceWei);
+              const tx = await contract.uploadModel(
+                form.name,
+                form.description,
+                form.category,
+                ipfsHash,
+                verification.modelHash,
+                verification.verificationStatus,
+                verification.verificationScore,
+                priceWei
+              );
               const receipt = await tx.wait();
               txHash = receipt.hash;
+              const listedEvent = receipt.logs
+                .map((log) => {
+                  try { return contract.interface.parseLog(log); } catch { return null; }
+                })
+                .find((event) => event?.name === "ModelListed");
+              contractModelId = listedEvent ? listedEvent.args.id.toString() : null;
             }
           }
         } catch (chainErr) {
-          console.warn("Blockchain tx failed (demo mode continues):", chainErr.message);
+          console.error("Blockchain listing error:", chainErr);
+          // If chain listing fails but demoMode is possible, simulate fallback
+          throw new Error(`Blockchain listing failed: ${chainErr.message}`);
         }
       }
+      if (!txHash || !contractModelId) throw new Error("Blockchain listing did not return a model ID.");
 
       // Step 3: Save metadata to backend
       const tags = form.tags.split(",").map(t => t.trim()).filter(Boolean);
-      await createModel({
+      const modelPayload = {
         name: form.name,
         description: form.description,
         category: form.category,
@@ -81,7 +159,34 @@ export default function Upload() {
         txHash,
         contractModelId,
         tags,
-      });
+        verificationStatus: verification.verificationStatus,
+        verificationScore: verification.verificationScore,
+        modelHash: verification.modelHash,
+        framework: verification.framework,
+        modelFormat: verification.modelFormat,
+        verificationChecks: verification.checks,
+        verificationWarnings: verification.warnings,
+        version: form.version,
+        versionNotes: form.versionNotes,
+      };
+      try {
+        if (parentModelId) await createModelVersion(parentModelId, modelPayload);
+        else await createModel(modelPayload);
+      } catch (saveErr) {
+        console.error("Save metadata error:", saveErr);
+        if (demoMode) {
+          // Save to localStorage for demo users so the app appears functional
+          try {
+            const key = "demo:models";
+            const raw = localStorage.getItem(key);
+            const arr = raw ? JSON.parse(raw) : [];
+            arr.unshift({ id: contractModelId, ...modelPayload, createdAt: new Date().toISOString() });
+            localStorage.setItem(key, JSON.stringify(arr.slice(0, 50)));
+          } catch (lsErr) {
+            console.warn("Failed to persist demo model locally", lsErr);
+          }
+        } else throw saveErr;
+      }
 
       setStep("done");
     } catch (err) {
@@ -97,16 +202,30 @@ export default function Upload() {
       <div className="page-wrapper" style={{ paddingTop: 100, textAlign: "center", maxWidth: 600 }}>
         <div style={{ fontSize: "4rem", marginBottom: 20 }}>🎉</div>
         <h1 style={{ fontSize: "2rem", marginBottom: 12 }}>Model <span className="gradient-text">Listed!</span></h1>
-        <p style={{ color: "var(--text2)", marginBottom: 24 }}>Your AI model has been uploaded to IPFS and listed on the marketplace.</p>
+        <p style={{ color: "var(--text2)", marginBottom: 24 }}>Version {form.version} has been verified, uploaded to IPFS, and listed on the marketplace.</p>
         {ipfsResult && (
           <div className={styles.successBox}>
             <div className={styles.successRow}><span>📦 IPFS Hash:</span><span className={styles.mono}>{ipfsResult.ipfsHash}</span></div>
-            {ipfsResult.demoMode && <div className="alert alert-info" style={{ marginTop: 12, fontSize: "0.82rem" }}>⚠️ Demo mode: Mock IPFS hash used. Set up Pinata for real storage.</div>}
+            {ipfsResult.verification && (
+              <>
+                <div className={styles.successRow}>
+                  <span>🛡️ Static Verification:</span>
+                  <span className="badge badge-green">
+                    Static {ipfsResult.verification.verificationStatus === "verified" ? "Verified" : ipfsResult.verification.verificationStatus} ({ipfsResult.verification.verificationScore}/100)
+                  </span>
+                </div>
+                <div className={styles.successRow}><span>SHA-256 Hash:</span><span className={styles.mono}>{ipfsResult.verification.modelHash}</span></div>
+                <div className={styles.successRow}><span>Format & Framework:</span><span>{ipfsResult.verification.modelFormat} · {ipfsResult.verification.framework}</span></div>
+              </>
+            )}
+            <div style={{ marginTop: 12, fontSize: "0.82rem", color: "var(--text3)", borderTop: "1px solid var(--border)", paddingTop: 10, textAlign: "left" }}>
+              ℹ️ <strong>Static Verification Notice:</strong> Checks file integrity, SHA-256 hash, structure, dependencies, and suspicious content. It does not measure model accuracy or execute live inference.
+            </div>
           </div>
         )}
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 28 }}>
           <button className="btn btn-primary" onClick={() => navigate("/marketplace")}>🛒 View Marketplace</button>
-          <button className="btn btn-secondary" onClick={() => { setStep("idle"); setFile(null); setIpfsResult(null); setForm({ name: "", description: "", category: "General", price: "0.05", tags: "" }); }}>
+          <button className="btn btn-secondary" onClick={() => { setStep("idle"); setFile(null); setIpfsResult(null); setForm({ name: "", description: "", category: "General", price: "0.05", tags: "", version: "1.0", versionNotes: "" }); }}>
             ⬆️ Upload Another
           </button>
         </div>
@@ -118,8 +237,10 @@ export default function Upload() {
 
   return (
     <div className="page-wrapper" style={{ paddingTop: 90, maxWidth: 760 }}>
-      <h1 className="section-title" style={{ marginBottom: 8 }}>Upload <span className="gradient-text">AI Model</span></h1>
-      <p style={{ color: "var(--text2)", marginBottom: 32 }}>Your file will be stored on IPFS. Metadata is recorded on the blockchain.</p>
+      <h1 className="section-title" style={{ marginBottom: 8 }}>{parentModel ? "Publish New" : "Upload"} <span className="gradient-text">Model Version</span></h1>
+      <p style={{ color: "var(--text2)", marginBottom: 32 }}>
+        Your file undergoes static security and integrity analysis before IPFS upload and blockchain listing.
+      </p>
 
       {/* Wallet Banner */}
       {!account && (
@@ -129,9 +250,23 @@ export default function Upload() {
         </div>
       )}
 
+      {demoMode && (
+        <div className="alert alert-warning" style={{ marginBottom: 24 }}>
+          🧪 Demo Mode active — uploads and listings are simulated locally for a fast, no-setup experience.
+        </div>
+      )}
+
       {error && <div className="alert alert-error" style={{ marginBottom: 20 }}>⚠️ {error}</div>}
 
+      {parentModel && <div className="alert alert-info" style={{ marginBottom: 20 }}>↳ New version of <strong>{parentModel.name}</strong> (currently v{parentModel.version || "1.0"})</div>}
+
       <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.infoStrip}>
+          <span>Static trust checks</span>
+          <span>IPFS ready</span>
+          <span>On-chain listing</span>
+        </div>
+
         {/* File Drop Zone */}
         <div
           className={`${styles.dropZone} ${file ? styles.dropZoneActive : ""}`}
@@ -170,6 +305,17 @@ export default function Upload() {
             <select id="category" name="category" className="form-input" value={form.category} onChange={handleChange}>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
+          </div>
+        </div>
+
+        <div className={styles.grid2}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="version">Version *</label>
+            <input id="version" name="version" className="form-input" placeholder="e.g. 1.1" value={form.version} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="versionNotes">Version Notes</label>
+            <input id="versionNotes" name="versionNotes" className="form-input" placeholder="Improved accuracy and reduced size" value={form.versionNotes} onChange={handleChange} />
           </div>
         </div>
 

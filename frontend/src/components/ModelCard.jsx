@@ -41,7 +41,17 @@ const ModelCard = memo(({ model }) => {
       <div className={styles.content}>
         {/* Header (Price & Badge) */}
         <div className={styles.header}>
-          <span className="badge badge-purple">{model.category}</span>
+          <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="badge badge-purple">{model.category}</span>
+            {model.contractModelId ? (
+              <span className="badge badge-cyan" title="Listed on Ethereum Smart Contract">✓ Blockchain Listed</span>
+            ) : (
+              <span className="badge badge-outline" style={{ opacity: 0.75 }} title="Legacy database listing">Legacy Listing</span>
+            )}
+            {model.verificationStatus === "verified" && (
+              <span className="badge badge-green" title="Verified Model Certificate">✓ Verified</span>
+            )}
+          </div>
           <div className={styles.price}>
             {isFree ? (
               <span className="badge badge-green">FREE</span>

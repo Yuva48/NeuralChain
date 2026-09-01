@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "title": "Reduce Marketplace Fee to 5%",
+    "description": "Currently the marketplace takes 10%. This proposal suggests reducing it to 5% to attract more creators.",
+    "creator": "0x123...abc",
+    "status": "Active",
+    "forVotes": 150000,
+    "againstVotes": 20000,
+    "abstainVotes": 5000,
+    "deadline": "2026-05-14T04:39:01.887Z",
+    "voters": []
+  },
+  {
+    "id": "2",
+    "title": "Integrate Akash Network for Inference",
+    "description": "Allow creators to host their models on Akash decentralized compute and link them directly to NeuralChain.",
+    "creator": "0x456...def",
+    "status": "Passed",
+    "forVotes": 500000,
+    "againstVotes": 10000,
+    "abstainVotes": 2000,
+    "deadline": "2026-05-05T04:39:01.887Z",
+    "voters": []
+  }
+]

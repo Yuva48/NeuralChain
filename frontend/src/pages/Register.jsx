@@ -13,9 +13,36 @@ export default function Register() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  // --- Validators ---
+  const validateUsername = (username) => {
+    if (!username.trim()) return "Username is required.";
+    if (!/[a-zA-Z]/.test(username))
+      return "Username must contain at least one letter (cannot be only numbers).";
+    return null;
+  };
+
+  const validateEmail = (email) => {
+    if (!email.trim()) return "Email is required.";
+    // Must end with @gmail.com (case-insensitive)
+    if (!email.toLowerCase().endsWith("@gmail.com"))
+      return "Email must be a valid Gmail address (e.g. yourname@gmail.com).";
+    // Local part (before @) must contain at least one alphabetic character
+    const localPart = email.split("@")[0];
+    if (!/[a-zA-Z]/.test(localPart))
+      return "Email local part must contain letters, not only numbers (e.g. user123@gmail.com).";
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    const usernameErr = validateUsername(form.username);
+    if (usernameErr) { setError(usernameErr); return; }
+
+    const emailErr = validateEmail(form.email);
+    if (emailErr) { setError(emailErr); return; }
+
     if (form.password !== form.confirm) {
       setError("Passwords do not match.");
       return;
@@ -40,9 +67,16 @@ export default function Register() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
+          <div className={styles.eyebrow}>Launch your creator profile</div>
           <div className={styles.logo}>✨</div>
-          <h1 className={styles.title}>Create Account</h1>
-          <p className={styles.sub}>Join the decentralised AI marketplace</p>
+          <h1 className={styles.title}>Create your account</h1>
+          <p className={styles.sub}>Join the premium marketplace for verified AI assets and blockchain-driven monetisation.</p>
+        </div>
+
+        <div className={styles.trustRow}>
+          <span>Trusted launch</span>
+          <span>On-chain assets</span>
+          <span>Creator rewards</span>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -51,12 +85,18 @@ export default function Register() {
           <div className="form-group">
             <label className="form-label" htmlFor="username">Username</label>
             <input id="username" name="username" type="text" className="form-input"
-              placeholder="e.g. AIResearcher" value={form.username} onChange={handleChange} required />
+              placeholder="e.g. AIResearcher42" value={form.username} onChange={handleChange} required />
+            <small style={{ color: "#a0aec0", fontSize: "0.78rem", marginTop: 4, display: "block" }}>
+              Must contain at least one letter (not only numbers)
+            </small>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="reg-email">Email Address</label>
-            <input id="reg-email" name="email" type="email" className="form-input"
-              placeholder="you@example.com" value={form.email} onChange={handleChange} required />
+            <input id="reg-email" name="email" type="text" className="form-input"
+              placeholder="yourname@gmail.com" value={form.email} onChange={handleChange} required />
+            <small style={{ color: "#a0aec0", fontSize: "0.78rem", marginTop: 4, display: "block" }}>
+              Must be a Gmail address with letters (e.g. user123@gmail.com)
+            </small>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="reg-password">Password</label>
