@@ -3,6 +3,8 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
+        "build": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
+        "start": "node backend/server.js",
         "install:all": "npm --prefix backend install && npm --prefix blockchain install && npm --prefix frontend install",
         "build:contracts": "npm --prefix blockchain run compile",
         "build:frontend": "npm --prefix frontend run build",

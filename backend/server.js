@@ -80,7 +80,22 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// 404 handler
+const path = require("path");
+const fs = require("fs");
+
+// Serve built frontend in production (All-in-One single service deployment)
+const frontendDistPath = path.join(__dirname, "../frontend/dist");
+if (fs.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
+    app.get("*", (req, res, next) => {
+        if (req.path.startsWith("/api/")) {
+            return next();
+        }
+        res.sendFile(path.join(frontendDistPath, "index.html"));
+    });
+}
+
+// 404 handler for API routes
 app.use((req, res) => {
     res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
 });
