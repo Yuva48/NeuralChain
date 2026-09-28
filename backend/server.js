@@ -46,11 +46,10 @@ app.use(rateLimit({
 }));
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-            return;
-        }
-        callback(new Error("Not allowed by CORS"));
+        // Allow requests with no origin (like mobile apps, curl, or same-origin static frontend)
+        if (!origin) return callback(null, true);
+        // Allow all origins in production/tunnel environments
+        return callback(null, true);
     },
     credentials: true,
 }));
