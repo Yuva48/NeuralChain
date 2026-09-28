@@ -14,7 +14,29 @@ NeuralChain is built as a production-grade full-stack Web3 application:
 
 ---
 
-## 🚀 Option 1: Deploy to Render.com (Recommended - Free & Instant)
+## 🚂 Option 1: Deploy to Railway.app (1-Click Automatic)
+
+Railway automatically detects [railway.json](file:///c:/Users/yuvan/OneDrive/Desktop/2026%20project/forournewproject/forournewproject/railway.json) and [Dockerfile](file:///c:/Users/yuvan/OneDrive/Desktop/2026%20project/forournewproject/forournewproject/Dockerfile):
+
+### Steps to Deploy:
+1. Go to **[Railway.app](https://railway.com)** and sign in with GitHub.
+2. Click **New Project > Deploy from GitHub repo**.
+3. Select your repository: **`Yuva48/NeuralChain`**.
+4. Railway will automatically start building the container image.
+5. In the Railway dashboard for your service, go to the **Variables** tab and add:
+   * `NODE_ENV`: `production`
+   * `JWT_SECRET`: `ai_marketplace_super_secret_jwt_key_2024` *(or your custom key)*
+   * `MONGODB_URI`: `mongodb+srv://surajnt18_db_user:5OEqNoeJWH9OtLSg@neuralchaindb.ezmrqrr.mongodb.net/?appName=NeuralChainDB`
+   * `CONTRACT_ADDRESS`: `0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9`
+   * `NEURAL_TOKEN_ADDRESS`: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`
+   * `PINATA_JWT`: *(optional for IPFS)*
+6. In the **Settings** tab:
+   * Under **Networking**, click **Generate Domain** (e.g. `neuralchain-production.up.railway.app`).
+7. Your full website (Frontend + Backend + DB) is now live on your custom Railway domain!
+
+---
+
+## 🚀 Option 2: Deploy to Render.com (Free Web Service)
 
 Render natively supports both Web Services and Docker:
 

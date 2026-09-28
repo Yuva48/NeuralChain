@@ -112,9 +112,9 @@ app.use((err, req, res, next) => {
 
 // Start server with MongoDB connection
 connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Backend running at http://localhost:${PORT}`);
-        console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(`🚀 Backend running at http://0.0.0.0:${PORT}`);
+        console.log(`📋 Health check: http://0.0.0.0:${PORT}/api/health`);
     });
 }).catch((error) => {
     console.error("Failed to start server:", error.message);
