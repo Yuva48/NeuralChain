@@ -1,8 +1,9 @@
 # Stage 1: Build Frontend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
+ENV NODE_ENV=development
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
@@ -15,7 +16,7 @@ ENV PORT=5000
 
 # Install backend dependencies
 COPY backend/package*.json ./backend/
-RUN cd backend && npm ci --only=production
+RUN cd backend && npm install --omit=dev
 
 # Copy backend application source code and built frontend dist
 COPY backend/ ./backend/
