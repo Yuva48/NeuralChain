@@ -239,9 +239,11 @@
     ],
     "contextWindow": 2048,
     "pricePerCall": 0.00015,
-    "downloads": 5120,
+    "downloads": 5121,
     "rating": "4.9",
-    "purchases": [],
+    "purchases": [
+      "1788113027268"
+    ],
     "createdAt": "2026-09-01T05:19:56.831Z",
     "updatedAt": "2026-09-01T05:19:56.831Z",
     "$setOnInsert": {
@@ -300,9 +302,11 @@
     ],
     "contextWindow": 77,
     "pricePerCall": 0.0001,
-    "downloads": 1980,
+    "downloads": 1981,
     "rating": "4.8",
-    "purchases": [],
+    "purchases": [
+      "1788113027268"
+    ],
     "createdAt": "2026-09-01T05:19:57.004Z",
     "updatedAt": "2026-09-01T05:19:57.004Z",
     "$setOnInsert": {
