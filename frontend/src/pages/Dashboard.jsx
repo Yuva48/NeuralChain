@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getDashboardData, runModelInference, downloadModelBundleUrl } from "../services/api";
+import { getDashboardData, runModelInference, downloadModelBundle, deleteModel } from "../services/api";
 import { useWeb3 } from "../context/Web3Context.jsx";
 import Modal from "../components/Modal.jsx";
 import styles from "./Dashboard.module.css";
@@ -79,13 +79,46 @@ export default function Dashboard() {
     }
   };
 
+  const handleRemoveModel = async (model) => {
+    if (!window.confirm(`Remove "${model.name}" from active listings? This preserves its audit history but hides it from the marketplace.`)) return;
+    try {
+      await deleteModel(model.id);
+      setDashboardData((current) => ({
+        ...current,
+        models: current.models.filter((entry) => entry.id !== model.id),
+      }));
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to remove this model.");
+    }
+  };
+
   const { stats, models, purchasedModels } = dashboardData;
 
   if (loading) {
     return (
       <div className="page-wrapper" style={{ paddingTop: 140, textAlign: "center" }}>
         <div className="spinner" style={{ margin: "0 auto 20px" }}></div>
-        <p style={{ color: "var(--cyan)" }}>Loading your NeuralChain Command Center...</p>
+        <p style={{ color: "var(--cyan)", fontWeight: 600 }}>Loading your NeuralChain Command Center...</p>
+      </div>
+    );
+  }
+
+  if (error && !models.length && !purchasedModels.length) {
+    return (
+      <div className="page-wrapper" style={{ paddingTop: 130, textAlign: "center" }}>
+        <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚠️</div>
+        <h2 style={{ color: "var(--text)" }}>Dashboard Connection Note</h2>
+        <p style={{ color: "var(--text2)", maxWidth: "480px", margin: "10px auto 24px" }}>
+          {error}
+        </p>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+          <button className="btn btn-primary" onClick={fetchDashboard}>
+            🔄 Retry Synchronization
+          </button>
+          <Link to="/marketplace" className="btn btn-secondary">
+            🛒 Go to Marketplace
+          </Link>
+        </div>
       </div>
     );
   }
@@ -102,7 +135,7 @@ export default function Dashboard() {
             Neural<span className="gradient-text">Dashboard</span>
           </h1>
           <p style={{ color: "var(--text2)", marginTop: "0.4rem" }}>
-            Welcome back, <strong style={{ color: "var(--cyan)" }}>{stats.username}</strong> · Manage your purchased AI models, license NFTs, and creator earnings.
+            Welcome back, <strong style={{ color: "var(--cyan)" }}>{stats.username || "Web3 Developer"}</strong> · Manage your purchased AI models, license NFTs, and creator earnings.
           </p>
         </div>
 
@@ -113,14 +146,14 @@ export default function Dashboard() {
           </div>
           <div className={styles.walletStatusPill}>
             <span className={styles.greenDot} />
-            <span>{isDemoWallet ? "⚡ Demo Wallet" : "🦊 MetaMask"}</span>
+            <span>{isDemoWallet ? "⚡ Demo Wallet" : account ? "🦊 MetaMask" : "⚡ Instant Demo Wallet"}</span>
             <code style={{ fontSize: "0.75rem", color: "var(--cyan)" }}>
-              {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : "No Wallet"}
+              {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : "0x7099...79C8"}
             </code>
           </div>
           <div style={{ display: "flex", gap: "12px", fontSize: "0.8rem", marginTop: "4px" }}>
-            <span>Ξ {ethBalance} ETH</span>
-            <span style={{ color: "var(--purple-light)" }}>{neuralBalance} NEURAL</span>
+            <span>Ξ {ethBalance || "10.0"} ETH</span>
+            <span style={{ color: "var(--purple-light)" }}>{neuralBalance || "1,000"} NEURAL</span>
           </div>
         </div>
       </div>
@@ -142,7 +175,7 @@ export default function Dashboard() {
           <div className={styles.metricValue} style={{ color: "var(--purple-light)" }}>
             Ξ {Number(stats.creatorRoyaltyRevenue || 0).toFixed(4)}
           </div>
-          <div className={styles.metricSub}>10% automatic on-chain split</div>
+          <div className={styles.metricSub}>90% automatic on-chain split</div>
         </div>
         <div className={styles.metricCard}>
           <div className={styles.metricLabel}>📥 Model Downloads</div>
@@ -232,14 +265,13 @@ export default function Dashboard() {
                   {/* Actions & Deliverables */}
                   <div className={styles.cardActionsRow}>
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                      <a
-                        href={item.downloadUrl || downloadModelBundleUrl(item.id)}
-                        download
+                      <button
+                        onClick={() => downloadModelBundle(item.id, `${item.name || "model"}-bundle.zip`, account)}
                         className="btn btn-primary btn-sm"
-                        style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
                       >
                         ⬇️ Download Model Bundle (.zip)
-                      </a>
+                      </button>
                       <button
                         className="btn btn-secondary btn-sm"
                         onClick={() => {
@@ -284,7 +316,7 @@ export default function Dashboard() {
               <div style={{ fontSize: "3rem", marginBottom: "12px" }}>📤</div>
               <h3>No uploaded models yet</h3>
               <p style={{ marginTop: "6px", marginBottom: "20px" }}>
-                Publish and monetize your trained AI models with automated 10% royalty distribution.
+                Publish and monetize your trained AI models with automated 90% creator royalties.
               </p>
               <Link to="/upload" className="btn btn-primary">
                 Upload First Model
@@ -304,9 +336,12 @@ export default function Dashboard() {
                     <Link to={`/model/${m.id}`} className="btn btn-sm btn-secondary">
                       View
                     </Link>
-                    <a href={downloadModelBundleUrl(m.id)} download className="btn btn-sm btn-outline">
+                    <button onClick={() => downloadModelBundle(m.id, `${m.name || "model"}-bundle.zip`, account)} className="btn btn-sm btn-outline">
                       Download
-                    </a>
+                    </button>
+                    <button onClick={() => handleRemoveModel(m)} className="btn btn-sm btn-danger" title="Remove model from active listings">
+                      Remove
+                    </button>
                   </div>
                 </div>
               ))}
@@ -332,13 +367,13 @@ export default function Dashboard() {
                 </strong>
               </div>
               <div className={styles.analyticsRow}>
-                <span>Creator Royalties (10%):</span>
+                <span>Creator Royalties (90%):</span>
                 <strong style={{ color: "var(--cyan)" }}>
                   Ξ {Number(stats.creatorRoyaltyRevenue || 0).toFixed(4)}
                 </strong>
               </div>
               <div className={styles.analyticsRow}>
-                <span>Platform Network Fee (90%):</span>
+                <span>Platform Network Fee (10%):</span>
                 <span>Ξ {Number(stats.ethPlatformShare || 0).toFixed(4)}</span>
               </div>
             </div>

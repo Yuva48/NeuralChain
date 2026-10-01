@@ -11,8 +11,8 @@ services:
     environment:
       - PORT=5000
       - NODE_ENV=production
-      - JWT_SECRET=ai_marketplace_super_secret_jwt_key_2024
-      - MONGODB_URI=mongodb+srv://surajnt18_db_user:5OEqNoeJWH9OtLSg@neuralchaindb.ezmrqrr.mongodb.net/?appName=NeuralChainDB
-      - CONTRACT_ADDRESS=0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
-      - NEURAL_TOKEN_ADDRESS=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+      - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in the deployment environment}
+      - MONGODB_URI=${MONGODB_URI:?Set MONGODB_URI in the deployment environment}
+      - MARKETPLACE_CONTRACT_ADDRESS=${MARKETPLACE_CONTRACT_ADDRESS:?Set MARKETPLACE_CONTRACT_ADDRESS in the deployment environment}
+      - RPC_URL=${RPC_URL:?Set RPC_URL in the deployment environment}
     restart: unless-stopped

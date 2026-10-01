@@ -5,8 +5,7 @@ const Web3Context = createContext(null);
 
 const TX_STORAGE_KEY = "web3:txHistory:v1";
 // Pre-funded demo buyer account on Hardhat localhost (Account #1 in Hardhat standard accounts)
-const DEMO_BUYER_PRIVATE_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-const DEMO_BUYER_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+const DEMO_BUYER_PRIVATE_KEY = import.meta.env.VITE_DEMO_PRIVATE_KEY || (import.meta.env.DEV ? "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d" : "");
 const HARDHAT_RPC = "http://127.0.0.1:8545";
 const HARDHAT_CHAIN_ID = 31337;
 
@@ -39,9 +38,15 @@ export function Web3Provider({ children }) {
 
   const accountRef = useRef(null);
   const providerRef = useRef(null);
+  const walletRequestRef = useRef(false);
 
   useEffect(() => {
     accountRef.current = account;
+    if (account) {
+      localStorage.setItem("neuralchain:wallet", account);
+    } else {
+      localStorage.removeItem("neuralchain:wallet");
+    }
   }, [account]);
 
   useEffect(() => {
@@ -82,35 +87,54 @@ export function Web3Provider({ children }) {
       setConnecting(true);
       setError(null);
 
-      const _provider = new ethers.JsonRpcProvider(HARDHAT_RPC);
-      await _provider.getBlockNumber(); // Test RPC connection
+      const privateKey = DEMO_BUYER_PRIVATE_KEY || "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
+      let _provider = null;
+      let _signer = null;
+      let _account = null;
+      let _chainId = HARDHAT_CHAIN_ID;
 
-      const wallet = new ethers.Wallet(DEMO_BUYER_PRIVATE_KEY, _provider);
-      const network = await _provider.getNetwork();
+      // Try connecting to live Hardhat RPC with a fast timeout
+      try {
+        const rpcProvider = new ethers.JsonRpcProvider(HARDHAT_RPC);
+        const blockPromise = rpcProvider.getBlockNumber();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("RPC timeout")), 1200));
+        await Promise.race([blockPromise, timeoutPromise]);
+        
+        const wallet = new ethers.Wallet(privateKey, rpcProvider);
+        const network = await rpcProvider.getNetwork();
+        _provider = rpcProvider;
+        _signer = wallet;
+        _account = wallet.address;
+        _chainId = Number(network.chainId);
+      } catch (rpcErr) {
+        // Standalone simulated demo wallet mode
+        const standaloneWallet = new ethers.Wallet(privateKey);
+        _account = standaloneWallet.address;
+        _signer = standaloneWallet;
+        _provider = null;
+      }
 
       setProvider(_provider);
-      setSigner(wallet);
-      setAccount(wallet.address);
-      setChainId(Number(network.chainId));
+      setSigner(_signer);
+      setAccount(_account);
+      setChainId(_chainId);
       setWalletType("demo");
       localStorage.setItem("neuralchain:walletType", "demo");
       setError(null);
 
-      await refreshBalances(wallet.address, _provider);
+      if (_provider) {
+        await refreshBalances(_account, _provider);
+      } else {
+        const savedEth = localStorage.getItem("neuralchain:demo_eth") || "10.0000";
+        const savedNeural = localStorage.getItem("neuralchain:demo_neural") || "5,000";
+        setEthBalance(savedEth);
+        setNeuralBalance(savedNeural);
+      }
       return true;
     } catch (err) {
-      console.warn("Local Hardhat node connection failed for demo wallet:", err.message);
-      const fallbackProvider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_sepolia");
-      const wallet = new ethers.Wallet(DEMO_BUYER_PRIVATE_KEY, fallbackProvider);
-      setProvider(fallbackProvider);
-      setSigner(wallet);
-      setAccount(wallet.address);
-      setChainId(11155111);
-      setWalletType("demo");
-      localStorage.setItem("neuralchain:walletType", "demo");
-      setEthBalance("100.0000");
-      setNeuralBalance("50,000");
-      return true;
+      console.error("Demo wallet connection error:", err);
+      setError(err.message || "Failed to connect demo wallet.");
+      return false;
     } finally {
       setConnecting(false);
     }
@@ -118,12 +142,17 @@ export function Web3Provider({ children }) {
 
   // Connect genuine MetaMask wallet
   const connectMetaMask = useCallback(async () => {
+    if (walletRequestRef.current) {
+      setError("MetaMask is already waiting for a response. Approve or reject the request in the extension.");
+      return false;
+    }
     if (!window.ethereum) {
-      setError("MetaMask browser extension not detected. Please install MetaMask or use the instant Demo Wallet.");
+      setError(import.meta.env.DEV && DEMO_BUYER_PRIVATE_KEY ? "MetaMask browser extension not detected. Use the local Demo Wallet instead." : "MetaMask browser extension not detected.");
       return false;
     }
 
     try {
+      walletRequestRef.current = true;
       setConnecting(true);
       setError(null);
 
@@ -145,11 +174,14 @@ export function Web3Provider({ children }) {
     } catch (err) {
       if (err?.code === 4001) {
         setError("Connection request rejected by user in MetaMask.");
+      } else if (err?.code === -32002 || String(err?.message || "").toLowerCase().includes("already pending")) {
+        setError("MetaMask already has a pending request. Approve or reject it in the extension, then try again.");
       } else {
         setError("MetaMask connection failed: " + (err?.message || String(err)));
       }
       return false;
     } finally {
+      walletRequestRef.current = false;
       setConnecting(false);
     }
   }, [refreshBalances]);
@@ -193,6 +225,15 @@ export function Web3Provider({ children }) {
     localStorage.setItem("neuralchain:walletType", "disconnected");
   }, []);
 
+  const toggleDemoMode = useCallback(() => {
+    if (walletType === "demo") {
+      disconnectWallet();
+      return false;
+    }
+    connectDemoWallet();
+    return true;
+  }, [connectDemoWallet, disconnectWallet, walletType]);
+
   // Handle wallet restoration ONCE on mount
   useEffect(() => {
     const savedType = localStorage.getItem("neuralchain:walletType");
@@ -201,7 +242,7 @@ export function Web3Provider({ children }) {
     }
     if (savedType === "metamask" && window.ethereum) {
       connectMetaMask();
-    } else {
+    } else if (import.meta.env.DEV && DEMO_BUYER_PRIVATE_KEY) {
       connectDemoWallet();
     }
     // Run exactly once on initial mount
@@ -282,16 +323,34 @@ export function Web3Provider({ children }) {
       connecting,
       walletType,
       isDemoWallet: walletType === "demo",
+      demoMode: walletType === "demo",
       isMetaMask: walletType === "metamask",
-      demoBuyerAddress: DEMO_BUYER_ADDRESS,
+      demoBuyerAddress: walletType === "demo" ? account : null,
+      demoAccount: walletType === "demo" ? account : null,
       error,
       transactions,
       ethBalance,
       neuralBalance,
+      chainLabel:
+        chainId === 31337
+          ? "Hardhat Localhost (31337)"
+          : chainId === 11155111
+          ? "Sepolia Testnet (11155111)"
+          : chainId
+          ? `Chain ID ${chainId}`
+          : "Not Connected",
       connectWallet: connectMetaMask,
       connectMetaMask,
       connectDemoWallet,
+      toggleDemoMode,
+      disconnect: disconnectWallet,
       disconnectWallet,
+      clearTransactions: () => {
+        setTransactions([]);
+        saveAllTx({});
+      },
+      formatAddress: (addr) =>
+        addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : "—",
       switchToHardhatNetwork,
       refreshBalances,
       addTransaction,
@@ -309,6 +368,7 @@ export function Web3Provider({ children }) {
       neuralBalance,
       connectMetaMask,
       connectDemoWallet,
+      toggleDemoMode,
       disconnectWallet,
       switchToHardhatNetwork,
       refreshBalances,

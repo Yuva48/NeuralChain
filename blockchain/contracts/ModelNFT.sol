@@ -13,7 +13,7 @@ contract ModelNFT is ERC1155, Ownable, ERC2981 {
     mapping(uint256 => string) private _uris;
 
     constructor() ERC1155("") Ownable(msg.sender) {
-        _setDefaultRoyalty(msg.sender, 1000); // 10% royalty
+        _setDefaultRoyalty(msg.sender, 9000); // 90% creator royalty
     }
 
     function mint(address account, uint256 id, uint256 amount, bytes memory data) public onlyOwner {

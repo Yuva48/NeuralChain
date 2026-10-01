@@ -1,5 +1,133 @@
 [
   {
+    "id": "model-1790838190481-ymiu7",
+    "name": "Vivvek",
+    "description": "Phisguard",
+    "category": "General",
+    "ipfsHash": "QmWQJMmu3ne7Tsi5X7FXczYZ8QWZjNjLz7gtja7yyhv3k6",
+    "modelHash": "77cccee6dc8dfcab3fee75b7213da7456e57836ab6735b9c2ed0873c3cac59d3",
+    "price": 0.1,
+    "owner": {
+      "id": "1788113027268",
+      "username": "Yuva",
+      "email": "yuvaneeth4@gmail.com"
+    },
+    "ownerWallet": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    "contractModelId": "contract-0424",
+    "blockchainTxHash": "0xc96a70bdc48e44f88a4d0e12d358d1adb4267cbeadbef2ab546d45a4da58eb70",
+    "verificationStatus": "verified",
+    "verificationScore": 100,
+    "verificationChecks": {
+      "fileFormat": true,
+      "fileSize": true,
+      "fileSignature": true,
+      "architecture": true,
+      "dependencies": true,
+      "basicInference": "skipped_static_only",
+      "suspiciousContent": true
+    },
+    "verificationWarnings": [],
+    "framework": "Not detected",
+    "modelFormat": "Model Archive",
+    "benchmarks": {
+      "accuracy": "98.4%",
+      "latency": "24ms"
+    },
+    "architecture": "Neural Transformer",
+    "downloads": 0,
+    "rating": "5.0",
+    "tags": [],
+    "purchases": [],
+    "createdAt": "2026-10-01T07:03:10.481Z",
+    "updatedAt": "2026-10-01T07:03:10.481Z"
+  },
+  {
+    "id": "model-1790796820370-lx1zv",
+    "name": "QuantumVision-Pro-1790796820360",
+    "description": "State-of-the-art vision transformer model uploaded via neuralchain gateway.",
+    "category": "Computer Vision",
+    "ipfsHash": "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco",
+    "modelHash": "0x1a0f3ceef93",
+    "price": 0.08,
+    "owner": {
+      "id": "demo-1790790364784",
+      "username": "DemoDeveloper",
+      "email": "developer@gmail.com"
+    },
+    "ownerWallet": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    "contractModelId": "0360",
+    "blockchainTxHash": "0x9934ea49e3197e98cf6f18ce1b713d59077a8ba6272117803b8ccbe8ed8ff7c4",
+    "verificationStatus": "verified",
+    "verificationScore": 98,
+    "verificationChecks": {
+      "staticIntegrity": "passed",
+      "formatSafety": "passed",
+      "hashMatch": true
+    },
+    "verificationWarnings": [],
+    "framework": "PyTorch",
+    "modelFormat": "SafeTensors",
+    "benchmarks": {
+      "accuracy": "98.4%",
+      "latency": "24ms"
+    },
+    "architecture": "Neural Transformer",
+    "downloads": 2,
+    "rating": "5.0",
+    "tags": [
+      "Vision",
+      "Transformer",
+      "PyTorch"
+    ],
+    "purchases": [
+      "wallet-0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+    ],
+    "createdAt": "2026-09-30T19:33:40.371Z",
+    "updatedAt": "2026-09-30T19:33:40.371Z"
+  },
+  {
+    "id": "model-1790796528939-76qp8",
+    "name": "QuantumVision-Pro-1790796528933",
+    "description": "State-of-the-art vision transformer model uploaded via neuralchain gateway.",
+    "category": "Computer Vision",
+    "ipfsHash": "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco",
+    "modelHash": "0x1a0f3ca7d2b",
+    "price": 0.08,
+    "owner": {
+      "id": "demo-1790790364784",
+      "username": "DemoDeveloper",
+      "email": "developer@gmail.com"
+    },
+    "ownerWallet": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    "contractModelId": "8933",
+    "blockchainTxHash": "0xa640fc663d82848953db01756d7c129901e014cc867ff84e58c80cee9f121741",
+    "verificationStatus": "verified",
+    "verificationScore": 98,
+    "verificationChecks": {
+      "staticIntegrity": "passed",
+      "formatSafety": "passed",
+      "hashMatch": true
+    },
+    "verificationWarnings": [],
+    "framework": "PyTorch",
+    "modelFormat": "SafeTensors",
+    "benchmarks": {
+      "accuracy": "98.4%",
+      "latency": "24ms"
+    },
+    "architecture": "Neural Transformer",
+    "downloads": 0,
+    "rating": "5.0",
+    "tags": [
+      "Vision",
+      "Transformer",
+      "PyTorch"
+    ],
+    "purchases": [],
+    "createdAt": "2026-09-30T19:28:48.939Z",
+    "updatedAt": "2026-09-30T19:28:48.939Z"
+  },
+  {
     "id": "model-whisper-tiny-onnx",
     "name": "Whisper-Tiny Multi-lingual Transcriber",
     "description": "Production-ready OpenAI Whisper-Tiny quantized to ONNX for ultra-fast, offline multi-lingual speech-to-text transcription and translation with zero external cloud dependencies.",
@@ -53,9 +181,11 @@
     ],
     "contextWindow": 30,
     "pricePerCall": 0.00005,
-    "downloads": 1420,
+    "downloads": 1421,
     "rating": "4.9",
-    "purchases": [],
+    "purchases": [
+      "wallet-0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+    ],
     "createdAt": "2026-09-01T05:19:55.801Z",
     "updatedAt": "2026-09-01T05:19:55.801Z",
     "$setOnInsert": {
@@ -364,9 +494,11 @@
     ],
     "contextWindow": 512,
     "pricePerCall": 0.00007,
-    "downloads": 2310,
+    "downloads": 2311,
     "rating": "4.9",
-    "purchases": [],
+    "purchases": [
+      "1788113027268"
+    ],
     "createdAt": "2026-09-01T05:19:57.223Z",
     "updatedAt": "2026-09-01T05:19:57.223Z",
     "$setOnInsert": {

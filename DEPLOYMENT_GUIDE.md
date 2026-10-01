@@ -25,8 +25,11 @@ Railway automatically detects [railway.json](file:///c:/Users/yuvan/OneDrive/Des
 4. Railway will automatically start building the container image.
 5. In the Railway dashboard for your service, go to the **Variables** tab and add:
    * `NODE_ENV`: `production`
-   * `JWT_SECRET`: `ai_marketplace_super_secret_jwt_key_2024` *(or your custom key)*
-   * `MONGODB_URI`: `mongodb+srv://surajnt18_db_user:5OEqNoeJWH9OtLSg@neuralchaindb.ezmrqrr.mongodb.net/?appName=NeuralChainDB`
+   * `JWT_SECRET`: generate a unique random value of at least 32 characters
+   * `MONGODB_URI`: your private MongoDB connection string
+   * `RPC_URL`: the RPC endpoint for the deployed marketplace chain
+   * `MARKETPLACE_CONTRACT_ADDRESS`: the deployed marketplace address
+   * `ADMIN_EMAIL` and `ADMIN_PASSWORD`: deployment-managed admin bootstrap credentials
    * `CONTRACT_ADDRESS`: `0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9`
    * `NEURAL_TOKEN_ADDRESS`: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`
    * `PINATA_JWT`: *(optional for IPFS)*

@@ -32,12 +32,21 @@ const purchaseSchema = new mongoose.Schema({
   // Payment details
   paymentMethod: {
     type: String,
-    enum: ["ETH", "NEURAL"],
+    enum: ["ETH", "NEURAL", "CREDIT_CARD", "STRIPE_FIAT", "USDC"],
     required: true,
   },
   paymentAmount: {
     type: Number,
     required: true,
+  },
+  licenseTier: {
+    type: Number,
+    enum: [1, 2, 3],
+    default: 1,
+  },
+  parentModelId: {
+    type: String,
+    default: null,
   },
   // Blockchain verification
   transactionHash: {
@@ -74,7 +83,6 @@ const purchaseSchema = new mongoose.Schema({
 });
 
 // Indexes for fast lookups
-purchaseSchema.index({ transactionHash: 1 });
 purchaseSchema.index({ buyerWallet: 1 });
 purchaseSchema.index({ modelId: 1 });
 purchaseSchema.index({ contractModelId: 1 });

@@ -1,20 +1,20 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import styles from "./ModelCard.module.css";
+import { soundFx } from "../services/soundFx";
 
 const CATEGORY_ICONS = {
   "Computer Vision": "👁️",
   "NLP": "💬",
   "Generative AI": "🎨",
   "Finance": "📈",
-  "Audio": "🎵",
+  "Audio": "🎙️",
   "General": "🤖",
 };
 
-// Simple hash function to generate a consistent hue from a string
 const getHueFromString = (str) => {
   let hash = 0;
-  if (!str) return 0;
+  if (!str) return 210;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
@@ -24,34 +24,42 @@ const getHueFromString = (str) => {
 const ModelCard = memo(({ model }) => {
   const icon = CATEGORY_ICONS[model.category] || "🤖";
   const isFree = model.price === 0;
-  
-  // Generate a visually pleasing dynamic gradient based on model ID or name
-  const hue1 = getHueFromString(model.id || model.name);
-  const hue2 = (hue1 + 40) % 360;
-  const gradient = `linear-gradient(135deg, hsl(${hue1}, 80%, 60%) 0%, hsl(${hue2}, 80%, 40%) 100%)`;
+
+  const hue1 = getHueFromString(model.id || model._id || model.name);
+  const hue2 = (hue1 + 45) % 360;
+  const gradient = `linear-gradient(135deg, hsl(${hue1}, 75%, 45%) 0%, hsl(${hue2}, 85%, 25%) 100%)`;
+
+  const modelId = model.id || model._id;
 
   return (
-    <Link to={`/model/${model.id}`} className={styles.card}>
+    <Link
+      to={`/model/${modelId}`}
+      className={styles.card}
+      onClick={() => soundFx.playClick()}
+    >
       {/* Dynamic Cover Graphic */}
       <div className={styles.cover} style={{ background: gradient }}>
-        <div className={styles.coverOverlay}></div>
+        <div className={styles.coverOverlay} />
         <span className={styles.coverIcon}>{icon}</span>
+        <span className={styles.royaltyPill}>⚡ 90% Royalty</span>
       </div>
 
       <div className={styles.content}>
-        {/* Header (Price & Badge) */}
+        {/* Header (Price & Badges) */}
         <div className={styles.header}>
-          <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className={styles.badges}>
             <span className="badge badge-purple">{model.category}</span>
-            {model.contractModelId ? (
-              <span className="badge badge-cyan" title="Listed on Ethereum Smart Contract">✓ Blockchain Listed</span>
-            ) : (
-              <span className="badge badge-outline" style={{ opacity: 0.75 }} title="Legacy database listing">Legacy Listing</span>
-            )}
-            {model.verificationStatus === "verified" && (
-              <span className="badge badge-green" title="Verified Model Certificate">✓ Verified</span>
-            )}
+            {model.verificationStatus === "verified" ? (
+              <span className="badge badge-green" title="Cryptographically Verified SHA-256">
+                ✓ Verified
+              </span>
+            ) : model.contractModelId ? (
+              <span className="badge badge-cyan" title="On-chain Listed">
+                ⛓️ On-Chain
+              </span>
+            ) : null}
           </div>
+
           <div className={styles.price}>
             {isFree ? (
               <span className="badge badge-green">FREE</span>
@@ -74,7 +82,9 @@ const ModelCard = memo(({ model }) => {
         {model.tags && model.tags.length > 0 && (
           <div className={styles.tags}>
             {model.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className={styles.tag}>{tag}</span>
+              <span key={tag} className={styles.tag}>
+                #{tag}
+              </span>
             ))}
           </div>
         )}
@@ -82,16 +92,16 @@ const ModelCard = memo(({ model }) => {
         {/* Footer */}
         <div className={styles.footer}>
           <div className={styles.meta}>
-            <span>⬇️ {model.downloads}</span>
-            <span>⭐ {model.rating}</span>
+            <span>⬇️ {model.downloads || 0}</span>
+            <span>⭐ {model.rating || 5.0}</span>
           </div>
-          <div className={styles.owner}>by {model.owner?.username || "Anonymous"}</div>
+          <div className={styles.owner}>by {model.owner?.username || "Architect"}</div>
         </div>
       </div>
 
       {/* Hover CTA */}
       <div className={styles.ctaOverlay}>
-        <span>View Details →</span>
+        <span>Inspect & Launch Studio →</span>
       </div>
     </Link>
   );

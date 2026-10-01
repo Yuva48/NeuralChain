@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { login as loginApi } from "../services/api";
 import styles from "./Auth.module.css";
@@ -7,6 +7,7 @@ import styles from "./Auth.module.css";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,11 +16,7 @@ export default function Login() {
 
   const validateEmail = (email) => {
     if (!email.trim()) return "Email is required.";
-    if (!email.toLowerCase().endsWith("@gmail.com"))
-      return "Email must be a valid Gmail address (e.g. yourname@gmail.com).";
-    const localPart = email.split("@")[0];
-    if (!/[a-zA-Z]/.test(localPart))
-      return "Email local part must contain letters, not only numbers (e.g. user123@gmail.com).";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email address.";
     return null;
   };
 
@@ -34,7 +31,7 @@ export default function Login() {
     try {
       const res = await loginApi(form);
       login(res.data.user, res.data.token);
-      navigate("/marketplace");
+      navigate(location.state?.from?.pathname || "/marketplace", { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || "Login failed. Please try again.");
     } finally {
@@ -63,10 +60,10 @@ export default function Login() {
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email Address</label>
-            <input id="email" name="email" type="text" className="form-input"
-              placeholder="yourname@gmail.com" value={form.email} onChange={handleChange} required />
+            <input id="email" name="email" type="email" autoComplete="email" className="form-input"
+              placeholder="you@company.com" value={form.email} onChange={handleChange} required />
             <small style={{ color: "#a0aec0", fontSize: "0.78rem", marginTop: 4, display: "block" }}>
-              Must be a Gmail address with letters (e.g. user123@gmail.com)
+              Use the email associated with your account.
             </small>
           </div>
           <div className="form-group">
@@ -79,13 +76,38 @@ export default function Login() {
           </button>
         </form>
 
+        <div style={{ marginTop: 12 }}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{ width: "100%", justifyContent: "center", border: "1px solid rgba(0, 245, 196, 0.35)", background: "rgba(0, 245, 196, 0.08)", color: "#00f5c4" }}
+            onClick={async () => {
+              setLoading(true);
+              setError(null);
+              try {
+                const { demoLogin } = await import("../services/api");
+                const res = await demoLogin();
+                login(res.data.user, res.data.token);
+                navigate(location.state?.from?.pathname || "/dashboard", { replace: true });
+              } catch (err) {
+                setError("Demo login failed: " + (err.response?.data?.error || err.message));
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+          >
+            ⚡ Demo Login
+          </button>
+        </div>
+
         <p className={styles.switch}>
           Don't have an account? <Link to="/register" className={styles.switchLink}>Create one →</Link>
         </p>
 
         {/* Demo Hint */}
         <div className="alert alert-info" style={{ marginTop: 16, fontSize: "0.83rem" }}>
-          💡 Register a new account to get started. No email verification needed.
+          💡 Use Demo Login for a local developer session, or sign in with your account.
         </div>
       </div>
     </div>

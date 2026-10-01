@@ -11,6 +11,9 @@ const ipfsRoutes = require("./routes/ipfs");
 const governanceRoutes = require("./routes/governance");
 const leaderboardRoutes = require("./routes/leaderboard");
 const dashboardRoutes = require("./routes/dashboard");
+const apiGatewayRoutes = require("./routes/apiGateway");
+const bountiesRoutes = require("./routes/bounties");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +21,9 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:4173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:4173",
     ...(process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean),
 ];
 
@@ -46,10 +52,9 @@ app.use(rateLimit({
 }));
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, curl, or same-origin static frontend)
         if (!origin) return callback(null, true);
-        // Allow all origins in production/tunnel environments
-        return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
 }));
@@ -69,6 +74,9 @@ app.use("/api/ipfs", ipfsRoutes);
 app.use("/api/governance", governanceRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/bounties", bountiesRoutes);
+app.use("/api/v1", apiGatewayRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

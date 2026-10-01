@@ -673,6 +673,6 @@
       "type": "function"
     }
   ],
-  "network": "localhost",
-  "deployedAt": "2026-09-28T18:19:11.455Z"
+  "network": "hardhat",
+  "deployedAt": "2026-09-30T15:20:33.731Z"
 }

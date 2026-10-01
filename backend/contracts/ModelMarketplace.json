@@ -67,11 +67,48 @@
         {
           "indexed": false,
           "internalType": "uint256",
+          "name": "tier",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
           "name": "amount",
           "type": "uint256"
         }
       ],
       "name": "LicenseMinted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "parentModelId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "parentOwner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "LineageRoyaltyPaid",
       "type": "event"
     },
     {
@@ -119,6 +156,12 @@
           "internalType": "string",
           "name": "ipfsHash",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "parentModelId",
+          "type": "uint256"
         }
       ],
       "name": "ModelListed",
@@ -150,6 +193,12 @@
           "internalType": "uint256",
           "name": "price",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tier",
+          "type": "uint256"
         }
       ],
       "name": "ModelPurchased",
@@ -174,6 +223,12 @@
           "indexed": false,
           "internalType": "uint256",
           "name": "tokenAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tier",
           "type": "uint256"
         }
       ],
@@ -233,7 +288,7 @@
     },
     {
       "inputs": [],
-      "name": "CREATOR_ROYALTY_BPS",
+      "name": "CREATOR_SHARE_BPS",
       "outputs": [
         {
           "internalType": "uint256",
@@ -271,6 +326,71 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "PARENT_LINEAGE_BPS",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PROTOCOL_FEE_BPS",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "TIER_COMMERCIAL",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "TIER_ENTERPRISE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "TIER_PERSONAL",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -289,11 +409,71 @@
           "internalType": "uint256",
           "name": "_modelId",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tier",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyModelTier",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_modelId",
+          "type": "uint256"
         }
       ],
       "name": "buyModelWithNeural",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tier",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyModelWithNeuralTier",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tier",
+          "type": "uint256"
+        }
+      ],
+      "name": "calculatePriceForTier",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -394,6 +574,11 @@
           "type": "uint256"
         },
         {
+          "internalType": "uint256",
+          "name": "parentModelId",
+          "type": "uint256"
+        },
+        {
           "internalType": "bool",
           "name": "isActive",
           "type": "bool"
@@ -410,6 +595,49 @@
     {
       "inputs": [],
       "name": "getModelCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_tier",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTierMultiplier",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        }
+      ],
+      "name": "getUserLicenseTier",
       "outputs": [
         {
           "internalType": "uint256",
@@ -504,6 +732,11 @@
         {
           "internalType": "uint256",
           "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "parentModelId",
           "type": "uint256"
         },
         {
@@ -660,6 +893,65 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_description",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_category",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_ipfsHash",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_modelHash",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_verificationStatus",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_verificationScore",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_parentModelId",
+          "type": "uint256"
+        }
+      ],
+      "name": "uploadModelWithLineage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "withdrawPlatformFees",
       "outputs": [],
@@ -667,6 +959,6 @@
       "type": "function"
     }
   ],
-  "network": "localhost",
-  "deployedAt": "2026-09-28T18:19:11.455Z"
+  "network": "hardhat",
+  "deployedAt": "2026-09-30T15:20:33.731Z"
 }

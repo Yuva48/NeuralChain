@@ -1,51 +1,52 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { getModels } from "../services/api";
 import ModelCard from "../components/ModelCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
+import { soundFx } from "../services/soundFx";
 import styles from "./Marketplace.module.css";
 
 const CATEGORIES = ["All", "Computer Vision", "NLP", "Generative AI", "Finance", "Audio", "General"];
+const FRAMEWORKS = ["All", "PyTorch", "ONNX", "GGUF", "SafeTensors", "TensorFlow"];
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
   { value: "popular", label: "Most Popular" },
-  { value: "trending", label: "Trending" },
   { value: "price-asc", label: "Price: Low → High" },
   { value: "price-desc", label: "Price: High → Low" },
   { value: "rating", label: "Best Rated" },
 ];
 
 const MARKETPLACE_HIGHLIGHTS = [
-  { label: "Verified assets", value: "120+" },
-  { label: "Royalty payout", value: "10%" },
-  { label: "Live on-chain", value: "ETH" },
-  { label: "Creator trust", value: "99%" },
+  { label: "Verified Models", value: "14 Assets" },
+  { label: "Creator Royalty", value: "90% Payout" },
+  { label: "Payment Rails", value: "ETH + NEURAL" },
+  { label: "Attestation", value: "SHA-256 IPFS" },
 ];
 
 export default function Marketplace() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
+
+  const initialSearch = searchParams.get("search") || "";
+  const initialCategory = searchParams.get("category") || "All";
+
+  const [search, setSearch] = useState(initialSearch);
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [category, setCategory] = useState(initialCategory);
+  const [framework, setFramework] = useState("All");
   const [sort, setSort] = useState("newest");
-  const [searchInput, setSearchInput] = useState("");
-  const highestPrice = useMemo(() => {
-    if (models.length === 0) return 1;
-    const max = Math.max(...models.map(m => m.price || 0));
-    return max > 0 ? max : 1;
-  }, [models]);
+  const [viewMode, setViewMode] = useState("grid"); // grid | table
 
   const [filters, setFilters] = useState({
     minPrice: 0,
-    maxPrice: 10,
-    minAccuracy: 0,
+    maxPrice: 5,
     freeOnly: false,
     verifiedOnly: false,
   });
-
-  useEffect(() => {
-    setFilters(prev => ({ ...prev, maxPrice: highestPrice }));
-  }, [highestPrice]);
 
   const fetchModels = useCallback(async () => {
     setLoading(true);
@@ -55,96 +56,118 @@ export default function Marketplace() {
         category: category !== "All" ? category : undefined,
         search: search || undefined,
         sort,
-        minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
-        maxPrice: filters.maxPrice > 0 && filters.maxPrice < highestPrice ? filters.maxPrice : undefined,
-        freeOnly: filters.freeOnly ? true : undefined,
-        verifiedOnly: filters.verifiedOnly ? true : undefined,
       });
-      setModels(response.data?.models || []);
+      const list = response.data?.models || (Array.isArray(response.data) ? response.data : []);
+      setModels(list);
     } catch (err) {
       console.error("Failed to fetch models:", err);
       setError("Failed to load models. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [category, search, sort, filters.minPrice, filters.maxPrice, filters.freeOnly, filters.verifiedOnly, highestPrice]);
+  }, [category, search, sort]);
 
   useEffect(() => {
     fetchModels();
   }, [fetchModels]);
 
+  useEffect(() => {
+    const nextSearch = searchParams.get("search") || "";
+    const nextCategory = searchParams.get("category") || "All";
+    setSearch(nextSearch);
+    setSearchInput(nextSearch);
+    setCategory(CATEGORIES.includes(nextCategory) ? nextCategory : "All");
+  }, [searchParams]);
+
   // Debounce search
   useEffect(() => {
-    const t = setTimeout(() => setSearch(searchInput), 400);
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setSearchParams((currentParams) => {
+        const nextParams = new URLSearchParams(currentParams);
+        if (searchInput) nextParams.set("search", searchInput);
+        else nextParams.delete("search");
+        return nextParams;
+      }, { replace: true });
+    }, 350);
     return () => clearTimeout(t);
-  }, [searchInput]);
+  }, [searchInput, setSearchParams]);
 
-  // Client-side filtering & sorting using canonical data representations
+  // Client-side filtering
   const filteredModels = useMemo(() => {
     let result = [...models];
 
-    // Search filter across name, owner username, description, and tags
     if (search) {
       const q = search.toLowerCase();
-      result = result.filter(m =>
-        (m.name || "").toLowerCase().includes(q) ||
-        (m.owner?.username || "").toLowerCase().includes(q) ||
-        (m.description || "").toLowerCase().includes(q) ||
-        (Array.isArray(m.tags) && m.tags.some(t => String(t).toLowerCase().includes(q)))
+      result = result.filter(
+        (m) =>
+          (m.name || "").toLowerCase().includes(q) ||
+          (m.owner?.username || "").toLowerCase().includes(q) ||
+          (m.description || "").toLowerCase().includes(q) ||
+          (Array.isArray(m.tags) && m.tags.some((t) => String(t).toLowerCase().includes(q)))
       );
     }
 
-    // Category filter
     if (category !== "All") {
-      result = result.filter(m => m.category === category);
+      result = result.filter((m) => m.category === category);
     }
 
-    // Price filter (canonical: price is a number in ETH)
+    if (framework !== "All") {
+      const fw = framework.toLowerCase();
+      result = result.filter(
+        (m) =>
+          (m.framework || "").toLowerCase().includes(fw) ||
+          (m.modelFormat || "").toLowerCase().includes(fw) ||
+          (m.name || "").toLowerCase().includes(fw) ||
+          (Array.isArray(m.tags) && m.tags.some((t) => String(t).toLowerCase().includes(fw)))
+      );
+    }
+
     if (filters.minPrice > 0) {
-      result = result.filter(m => (m.price || 0) >= filters.minPrice);
+      result = result.filter((m) => (m.price || 0) >= filters.minPrice);
     }
     if (filters.maxPrice > 0) {
-      result = result.filter(m => (m.price || 0) <= filters.maxPrice);
+      result = result.filter((m) => (m.price || 0) <= filters.maxPrice);
     }
 
-    // Free filter (canonical: price === 0)
     if (filters.freeOnly) {
-      result = result.filter(m => m.price === 0);
+      result = result.filter((m) => m.price === 0);
     }
 
-    // Verified filter (canonical: verificationStatus === 'verified')
     if (filters.verifiedOnly) {
-      result = result.filter(m => m.verificationStatus === "verified");
+      result = result.filter((m) => m.verificationStatus === "verified");
     }
 
-    // Sorting
     if (sort === "price-asc") result.sort((a, b) => (a.price || 0) - (b.price || 0));
     else if (sort === "price-desc") result.sort((a, b) => (b.price || 0) - (a.price || 0));
     else if (sort === "rating") result.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
     else if (sort === "popular") result.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
-    else if (sort === "trending") result.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
     else result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     return result;
-  }, [models, search, category, sort, filters]);
+  }, [models, search, category, framework, sort, filters]);
 
-  const skeletons = useMemo(() => Array(6).fill(0).map((_, i) => <SkeletonCard key={`skeleton-${i}`} />), []);
-
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  const skeletons = useMemo(
+    () => Array(6).fill(0).map((_, i) => <SkeletonCard key={`skeleton-${i}`} />),
+    []
+  );
 
   return (
     <div className="page-wrapper" style={{ paddingTop: 90 }}>
       {/* Header */}
       <div className={styles.header}>
-        <div>
-          <div className={styles.eyebrow}>Marketplace intelligence</div>
-          <h1 className="section-title">Explore <span className="gradient-text">Models</span></h1>
-          <p style={{ color: "var(--text2)", marginTop: 8 }}>
-            {loading ? "Loading available models..." : `${filteredModels.length} model${filteredModels.length !== 1 ? "s" : ""} found`}
-          </p>
+        <div className={styles.eyebrow}>
+          <span>⚡</span>
+          <span>Decentralized AI Hub · 90% Creator Revenue</span>
         </div>
+        <h1 className="section-title">
+          Explore AI <span className="gradient-text">Weights & Models</span>
+        </h1>
+        <p style={{ color: "var(--text2)", marginTop: 8 }}>
+          {loading
+            ? "Loading decentralized models..."
+            : `${filteredModels.length} model${filteredModels.length !== 1 ? "s" : ""} available on-chain with verified provenance`}
+        </p>
       </div>
 
       <div className={styles.highlightStrip}>
@@ -159,153 +182,246 @@ export default function Marketplace() {
       <div className={styles.mainContent}>
         {/* Sidebar Filters */}
         <aside className={styles.sidebar}>
-          <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.5rem', fontWeight: '700' }}>Filters</h3>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 style={{ marginBottom: "1.25rem", fontWeight: "700" }}>Filters & Sliders</h3>
 
-            {/* Price Range */}
+            {/* Framework Filter */}
             <div className={styles.filterGroup}>
-              <label style={{ fontWeight: '600', marginBottom: '0.75rem', display: 'block' }}>
-                Price Range (ETH)
+              <label style={{ fontWeight: "600", marginBottom: "0.5rem", display: "block", fontSize: "0.85rem", color: "#cbd5e1" }}>
+                Target Framework
               </label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.001"
-                  max={highestPrice}
-                  value={filters.minPrice}
-                  onChange={(e) => handleFilterChange('minPrice', parseFloat(e.target.value) || 0)}
-                  className="glass-input"
-                  style={{ width: '60px' }}
-                  placeholder="Min"
-                />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.001"
-                  max={highestPrice}
-                  value={filters.maxPrice}
-                  onChange={(e) => handleFilterChange('maxPrice', parseFloat(e.target.value) || 0)}
-                  className="glass-input"
-                  style={{ width: '60px' }}
-                  placeholder="Max"
-                />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                {FRAMEWORKS.map((fw) => (
+                  <button
+                    key={fw}
+                    onClick={() => {
+                      soundFx.playClick();
+                      setFramework(fw);
+                    }}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: framework === fw ? "rgba(99,102,241,0.25)" : "transparent",
+                      color: framework === fw ? "#818cf8" : "#94a3b8",
+                      fontSize: "0.78rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {fw}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Accuracy Filter — Marked as benchmark unavailable per schema requirement */}
+            {/* Price Filter */}
             <div className={styles.filterGroup}>
-              <label style={{ fontWeight: '600', marginBottom: '0.25rem', display: 'block', color: 'var(--text2)' }}>
-                Min Accuracy: Unavailable
+              <label style={{ fontWeight: "600", marginBottom: "0.75rem", display: "block", fontSize: "0.85rem", color: "#cbd5e1" }}>
+                Max Price (ETH): <span style={{ color: "#00f5c4" }}>Ξ {filters.maxPrice}</span>
               </label>
               <input
                 type="range"
-                min="0"
-                max="100"
-                value="0"
-                disabled
-                style={{ width: '100%', opacity: 0.4, cursor: 'not-allowed' }}
+                min="0.01"
+                max="5"
+                step="0.05"
+                value={filters.maxPrice}
+                onChange={(e) => setFilters({ ...filters, maxPrice: parseFloat(e.target.value) || 5 })}
+                style={{ width: "100%", accentColor: "#00f5c4" }}
               />
-              <span style={{ fontSize: '0.75rem', color: 'var(--text2)', display: 'block', marginTop: '0.25rem' }}>
-                Benchmark data not in model schema
-              </span>
             </div>
 
             {/* Checkboxes */}
             <div className={styles.filterGroup}>
-              <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', cursor: 'pointer', marginBottom: '0.75rem' }}>
+              <label style={{ display: "flex", gap: "0.5rem", alignItems: "center", cursor: "pointer", marginBottom: "0.75rem", fontSize: "0.88rem" }}>
                 <input
                   type="checkbox"
                   checked={filters.freeOnly}
-                  onChange={(e) => handleFilterChange('freeOnly', e.target.checked)}
+                  onChange={(e) => {
+                    soundFx.playClick();
+                    setFilters({ ...filters, freeOnly: e.target.checked });
+                  }}
                 />
                 <span>Free Models Only</span>
               </label>
-              <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', cursor: 'pointer' }}>
+              <label style={{ display: "flex", gap: "0.5rem", alignItems: "center", cursor: "pointer", fontSize: "0.88rem" }}>
                 <input
                   type="checkbox"
                   checked={filters.verifiedOnly}
-                  onChange={(e) => handleFilterChange('verifiedOnly', e.target.checked)}
+                  onChange={(e) => {
+                    soundFx.playClick();
+                    setFilters({ ...filters, verifiedOnly: e.target.checked });
+                  }}
                 />
-                <span>Verified Models Only</span>
+                <span>Verified SHA-256 Only</span>
               </label>
             </div>
 
             {/* Reset Filters */}
             <button
-              onClick={() => setFilters({ minPrice: 0, maxPrice: highestPrice, minAccuracy: 0, freeOnly: false, verifiedOnly: false })}
+              onClick={() => {
+                soundFx.playClick();
+                setFilters({ minPrice: 0, maxPrice: 5, freeOnly: false, verifiedOnly: false });
+                setCategory("All");
+                setFramework("All");
+                setSearchInput("");
+              }}
               className="btn btn-secondary btn-sm"
-              style={{ width: '100%', marginTop: '1rem' }}
+              style={{ width: "100%", marginTop: "1rem" }}
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         </aside>
 
-        {/* Main Content */}
+        {/* Main Content Area */}
         <div className={styles.content}>
-          {/* Search & Sort Bar */}
+          {/* Toolbar with Search, Sort & View Mode Switcher */}
           <div className={styles.toolbar}>
             <div className={styles.searchWrap}>
               <span className={styles.searchIcon}>🔍</span>
               <input
-                id="search-input"
                 type="text"
                 className={styles.searchInput}
-                placeholder="Search models, creators..."
+                placeholder="Search models, creators, tags..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </div>
 
             <select
-              id="sort-select"
               className={styles.select}
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => {
+                soundFx.playClick();
+                setSort(e.target.value);
+              }}
             >
               {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
               ))}
             </select>
+
+            {/* View Switcher (Grid vs Table) */}
+            <div className={styles.viewSwitcher}>
+              <button
+                className={`${styles.viewBtn} ${viewMode === "grid" ? styles.viewBtnActive : ""}`}
+                onClick={() => {
+                  soundFx.playClick();
+                  setViewMode("grid");
+                }}
+                title="Grid View"
+              >
+                ⊞ Cards
+              </button>
+              <button
+                className={`${styles.viewBtn} ${viewMode === "table" ? styles.viewBtnActive : ""}`}
+                onClick={() => {
+                  soundFx.playClick();
+                  setViewMode("table");
+                }}
+                title="Table Matrix View"
+              >
+                ☰ Matrix
+              </button>
+            </div>
           </div>
 
-          {/* Category Pills */}
+          {/* Category Filter Pills */}
           <div className={styles.categories}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
-                id={`cat-${cat.replace(/\s+/g, "-").toLowerCase()}`}
                 className={`${styles.catBtn} ${category === cat ? styles.catActive : ""}`}
-                onClick={() => setCategory(cat)}
+                onClick={() => {
+                  soundFx.playClick();
+                  setCategory(cat);
+                  const nextParams = new URLSearchParams(searchParams);
+                  if (cat !== "All") nextParams.set("category", cat);
+                  else nextParams.delete("category");
+                  setSearchParams(nextParams, { replace: true });
+                }}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          {/* Content */}
           {error && (
             <div className="alert alert-error" style={{ marginBottom: 24 }}>
-              ⚠️ {error}
+              <span>⚠️ {error}</span>
+              <button className="btn btn-sm btn-ghost" onClick={fetchModels}>Retry</button>
             </div>
           )}
 
           {loading ? (
-            <div className={styles.grid}>
-              {skeletons}
-            </div>
+            <div className={styles.grid}>{skeletons}</div>
           ) : filteredModels.length === 0 ? (
             <div className="empty-state">
               <div className="icon">🔍</div>
-              <h3>No models found</h3>
-              <p>Try adjusting your filters or search terms.</p>
+              <h3>No matching models found</h3>
+              <p>Try modifying your search keywords or loosening the framework filters.</p>
             </div>
-          ) : (
+          ) : viewMode === "grid" ? (
             <div className={styles.grid}>
               {filteredModels.map((model) => (
-                <ModelCard key={model.id} model={model} />
+                <ModelCard key={model._id || model.id} model={model} />
               ))}
+            </div>
+          ) : (
+            <div className={styles.tableView}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Model Name</th>
+                    <th>Category</th>
+                    <th>Creator</th>
+                    <th>Framework</th>
+                    <th>Downloads</th>
+                    <th>Rating</th>
+                    <th>License Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredModels.map((model) => {
+                    const modelId = model._id || model.id;
+                    return (
+                      <tr
+                        key={modelId}
+                        className={styles.tableRow}
+                        onClick={() => {
+                          soundFx.playClick();
+                          navigate(`/model/${modelId}`);
+                        }}
+                      >
+                        <td style={{ fontWeight: 700, color: "#fff" }}>
+                          {model.name}
+                          {model.verificationStatus === "verified" && (
+                            <span style={{ marginLeft: 6, color: "#34d399", fontSize: "0.78rem" }}>✓</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className="badge badge-purple">{model.category}</span>
+                        </td>
+                        <td style={{ color: "#94a3b8" }}>{model.owner?.username || "Architect"}</td>
+                        <td>
+                          <span className="badge badge-cyan">{model.framework || "ONNX"}</span>
+                        </td>
+                        <td>{model.downloads || 0}</td>
+                        <td>⭐ {model.rating || 5.0}</td>
+                        <td style={{ fontWeight: 800, color: "#00f5c4" }}>
+                          {model.price ? `Ξ ${model.price}` : "Free"}
+                        </td>
+                        <td>
+                          <button className="btn btn-sm btn-primary">Launch ⚡</button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -313,4 +429,3 @@ export default function Marketplace() {
     </div>
   );
 }
-

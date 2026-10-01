@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "demo:create": "node scripts/demo_create_listing.js"
+        "demo:create": "node scripts/demo_create_listing.js",
+        "admin:create": "node scripts/createAdmin.js"
     },
     "dependencies": {
         "archiver": "^8.0.0",

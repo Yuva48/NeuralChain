@@ -1,22 +1,58 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
+const fs = require("fs");
+const path = require("path");
 const User = require("../models/User");
+const { signUserToken } = require("../utils/auth");
 
 const router = express.Router();
+const USERS_FILE = path.join(__dirname, "../data/users.json");
 
-const getJwtSecret = () => {
-    if (process.env.JWT_SECRET && process.env.JWT_SECRET !== "fallback_secret") {
-        return process.env.JWT_SECRET;
+function readFallbackUsers() {
+    try {
+        return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+    } catch {
+        return [];
     }
+}
 
-    if (process.env.NODE_ENV !== "production") {
-        return "neuralchain-dev-secret";
+function toUserRecord(user) {
+    if (!user) return null;
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        passwordHash: user.passwordHash || user.password,
+        walletAddress: user.walletAddress || null,
+        role: user.role || "buyer",
+        isSellerVerified: Boolean(user.isSellerVerified),
+        createdAt: user.createdAt || new Date(),
+    };
+}
+
+async function findUserByEmail(email) {
+    try {
+        const user = await User.findOne({ email });
+        if (user) return toUserRecord(user);
+    } catch (error) {
+        console.warn("Mongo user lookup unavailable; using local user store:", error.message);
     }
+    return readFallbackUsers().find((user) => user.email === email) || null;
+}
 
-    throw new Error("JWT_SECRET is required in production mode.");
-};
+async function saveUser(user) {
+    try {
+        const document = new User(user);
+        await document.save();
+        return toUserRecord(document);
+    } catch (error) {
+        console.warn("Mongo user save unavailable; using local user store:", error.message);
+        const users = readFallbackUsers().filter((entry) => entry.email !== user.email);
+        users.push({...user, password: user.passwordHash });
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+        return toUserRecord(user);
+    }
+}
 
 const normalizeEmail = (value) => typeof value === "string" ? value.trim().toLowerCase() : "";
 const normalizeUsername = (value) => typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
@@ -41,20 +77,15 @@ router.post("/register", async(req, res) => {
             return res.status(400).json({ error: "Username must contain at least one letter." });
         }
 
-        if (!email.toLowerCase().endsWith("@gmail.com")) {
-            return res.status(400).json({ error: "Email must be a valid Gmail address (e.g. yourname@gmail.com)." });
-        }
-
-        const localPart = email.split("@")[0];
-        if (!/[a-zA-Z]/.test(localPart)) {
-            return res.status(400).json({ error: "Email local part must contain letters, not only numbers." });
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ error: "Please provide a valid email address." });
         }
 
         if (password.length < 8) {
             return res.status(400).json({ error: "Password must be at least 8 characters long." });
         }
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await findUserByEmail(email);
         if (existingUser) {
             return res.status(409).json({ error: "Email already registered." });
         }
@@ -71,16 +102,23 @@ router.post("/register", async(req, res) => {
             createdAt: new Date(),
         });
 
-        await newUser.save();
+        const savedUser = await saveUser({
+            id: newUser.id,
+            username: rawUsername,
+            email,
+            passwordHash: hashedPassword,
+            walletAddress: walletAddress || null,
+            role: "buyer",
+            isSellerVerified: false,
+            createdAt: new Date(),
+        });
 
-        const token = jwt.sign({ id: newUser.id, username: rawUsername, email },
-            getJwtSecret(), { expiresIn: "7d" }
-        );
+        const token = signUserToken(savedUser);
 
         res.status(201).json({
             message: "Registration successful!",
             token,
-            user: { id: newUser.id, username: rawUsername, email, walletAddress: newUser.walletAddress },
+            user: { id: savedUser.id, username: rawUsername, email, walletAddress: savedUser.walletAddress, role: savedUser.role },
         });
     } catch (err) {
         console.error("Registration error:", err.message);
@@ -98,33 +136,66 @@ router.post("/login", async(req, res) => {
             return res.status(400).json({ error: "Email and password are required." });
         }
 
-        if (!email.toLowerCase().endsWith("@gmail.com")) {
-            return res.status(400).json({ error: "Email must be a valid Gmail address (e.g. yourname@gmail.com)." });
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ error: "Please provide a valid email address." });
         }
 
-        const localPart = email.split("@")[0];
-        if (!/[a-zA-Z]/.test(localPart)) {
-            return res.status(400).json({ error: "Email local part must contain letters, not only numbers." });
-        }
-
-        const user = await User.findOne({ email });
+        const user = await findUserByEmail(email);
         if (!user) return res.status(401).json({ error: "Invalid credentials." });
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
         if (!isValid) return res.status(401).json({ error: "Invalid credentials." });
 
-        const token = jwt.sign({ id: user.id, username: user.username, email: user.email },
-            getJwtSecret(), { expiresIn: "7d" }
-        );
+        const token = signUserToken(user);
 
-        res.json({
-            message: "Login successful!",
+        return res.json({
+            message: "Login successful.",
             token,
-            user: { id: user.id, username: user.username, email: user.email, walletAddress: user.walletAddress },
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                walletAddress: user.walletAddress,
+                role: user.role,
+            },
         });
     } catch (err) {
         console.error("Login error:", err.message);
-        res.status(500).json({ error: "Server error during login." });
+        return res.status(500).json({ error: "Server error during login." });
+    }
+});
+
+// POST /api/auth/demo-login — 1-click instant developer / demo access
+router.post("/demo-login", async(req, res) => {
+    try {
+        const demoEmail = "developer@gmail.com";
+        let user = await findUserByEmail(demoEmail);
+
+        if (!user) {
+            const hashedPassword = await bcrypt.hash("Password123!", 10);
+            user = {
+                id: `demo-${Date.now()}`,
+                username: "DemoDeveloper",
+                email: demoEmail,
+                passwordHash: hashedPassword,
+                walletAddress: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                role: "creator",
+                isSellerVerified: true,
+                createdAt: new Date(),
+            };
+            user = await saveUser(user);
+        }
+
+        const token = signUserToken(user, { expiresIn: "30d" });
+
+        res.json({
+            message: "Instant developer login successful!",
+            token,
+            user: { id: user.id, username: user.username, email: user.email, walletAddress: user.walletAddress, role: user.role },
+        });
+    } catch (err) {
+        console.error("Demo login error:", err.message);
+        res.status(500).json({ error: "Server error during demo login." });
     }
 });
 

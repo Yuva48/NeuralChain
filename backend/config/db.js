@@ -1,47 +1,40 @@
 const mongoose = require("mongoose");
 
+mongoose.set("bufferCommands", false);
+
 let isConnected = false;
 
-const connectDB = async () => {
-  if (isConnected) {
-    console.log("✅ Using existing MongoDB connection");
-    return;
-  }
-
-  try {
-    const mongoUri = process.env.MONGODB_URI;
-    
-    if (!mongoUri) {
-      throw new Error(
-        "MONGODB_URI environment variable is not set. Please add it to your .env file."
-      );
+const connectDB = async() => {
+    if (isConnected) {
+        console.log("✅ Using existing MongoDB connection");
+        return;
     }
 
-    // Check if URI contains placeholder
-    if (mongoUri.includes("<db_username>") || mongoUri.includes("<db_password>")) {
-      throw new Error(
-        "MongoDB URI contains placeholders (<db_username> or <db_password>). Please replace with actual credentials in .env file."
-      );
+    try {
+        const mongoUri = process.env.MONGODB_URI;
+
+        if (!mongoUri || mongoUri.includes("<db_username>") || mongoUri.includes("<db_password>")) {
+            console.warn("⚠️ MongoDB URI not configured or contains placeholder. Running in resilient local fallback mode.");
+            return;
+        }
+
+        console.log("🔗 Connecting to MongoDB Atlas...");
+        await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
+
+        isConnected = true;
+        console.log("✅ MongoDB Atlas connected successfully");
+        return mongoose.connection;
+    } catch (error) {
+        console.warn("⚠️ MongoDB connection notice:", error.message, "- running in fallback persistence mode.");
     }
-
-    console.log("🔗 Connecting to MongoDB...");
-    await mongoose.connect(mongoUri);
-
-    isConnected = true;
-    console.log("✅ MongoDB connected successfully");
-    return mongoose.connection;
-  } catch (error) {
-    console.error("❌ MongoDB connection error:", error.message);
-    process.exit(1);
-  }
 };
 
-const disconnectDB = async () => {
-  if (isConnected) {
-    await mongoose.disconnect();
-    isConnected = false;
-    console.log("✅ MongoDB disconnected");
-  }
+const disconnectDB = async() => {
+    if (isConnected) {
+        await mongoose.disconnect();
+        isConnected = false;
+        console.log("✅ MongoDB disconnected");
+    }
 };
 
 module.exports = { connectDB, disconnectDB };

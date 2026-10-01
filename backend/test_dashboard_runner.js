@@ -36,7 +36,7 @@ function runDashboardTests() {
       }
     });
 
-    const creatorRoyaltyRevenue = Number((ethRevenue * 0.1).toFixed(4));
+    const creatorRoyaltyRevenue = Number((ethRevenue * 0.9).toFixed(4));
     const totalReviews = myReviews.length;
     const averageRating =
       totalReviews > 0
@@ -98,7 +98,7 @@ function runDashboardTests() {
   console.log("\n[Test C] Verified Purchase Revenue Check:");
   assert.strictEqual(statsB.verifiedSales, 1);
   assert.strictEqual(statsB.ethRevenue, 0.1);
-  assert.strictEqual(statsB.creatorRoyaltyRevenue, 0.01); // 10%
+  assert.strictEqual(statsB.creatorRoyaltyRevenue, 0.09); // 90% creator royalty
 
   // Test D — Failed / Unverified Purchase Filtering Check
   console.log("\n[Test D] Failed/Unverified Transaction Exclusions:");

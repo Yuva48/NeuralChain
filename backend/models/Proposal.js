@@ -68,7 +68,6 @@ const proposalSchema = new mongoose.Schema({
 });
 
 // Indexes
-proposalSchema.index({ id: 1 });
 proposalSchema.index({ status: 1 });
 proposalSchema.index({ votingDeadline: 1 });
 

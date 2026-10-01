@@ -129,13 +129,13 @@ This document summarizes the comprehensive migration of a blockchain-integrated 
 **Critical Fixes:**
 - ✅ Revenue calculation: Changed from `downloads × price` to verified purchases
 - ✅ Payment method tracking: Separated ETH and NEURAL sales
-- ✅ Creator royalty: Implemented 10% creator / 90% platform split
+- ✅ Creator royalty: Implemented 90% creator / 10% platform split
 - ✅ Real transaction data only: No synthetic earnings
 
 **Metrics Provided:**
 - Total sales amount
-- Creator revenue (10% of sales)
-- Platform revenue (90% of sales)
+- Creator revenue (90% of sales)
+- Platform protocol revenue (10% of sales)
 - Verified transactions count
 - Unique buyer count
 - Downloads count
@@ -290,7 +290,7 @@ GET http://localhost:5000/api/health
 - ✅ Contract addresses unchanged
 - ✅ Purchase verification logic intact
 - ✅ NFT licensing functional
-- ✅ Creator royalties (10/90 split) implemented
+- ✅ Creator royalties (90/10 split) implemented
 - ✅ NEURAL token governance working
 - ✅ IPFS/Pinata integration active
 

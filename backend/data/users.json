@@ -60,5 +60,16 @@
     "password": "$2a$10$3KezhuqJBf5GWPQowoNE8eEoRVWvC77Px1BGD0vxbxfDUQXNGjasC",
     "walletAddress": null,
     "createdAt": "2026-05-20T16:58:56.924Z"
+  },
+  {
+    "id": "demo-1790790364784",
+    "username": "DemoDeveloper",
+    "email": "developer@gmail.com",
+    "passwordHash": "$2a$10$ksemsTpYo.BXINSBV1g3pO7ueGnTMNxn3h8AvCtQje3SQD1PuiF2y",
+    "walletAddress": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "role": "creator",
+    "isSellerVerified": true,
+    "createdAt": "2026-09-30T17:46:04.784Z",
+    "password": "$2a$10$ksemsTpYo.BXINSBV1g3pO7ueGnTMNxn3h8AvCtQje3SQD1PuiF2y"
   }
 ]

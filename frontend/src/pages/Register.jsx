@@ -23,13 +23,7 @@ export default function Register() {
 
   const validateEmail = (email) => {
     if (!email.trim()) return "Email is required.";
-    // Must end with @gmail.com (case-insensitive)
-    if (!email.toLowerCase().endsWith("@gmail.com"))
-      return "Email must be a valid Gmail address (e.g. yourname@gmail.com).";
-    // Local part (before @) must contain at least one alphabetic character
-    const localPart = email.split("@")[0];
-    if (!/[a-zA-Z]/.test(localPart))
-      return "Email local part must contain letters, not only numbers (e.g. user123@gmail.com).";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email address.";
     return null;
   };
 
@@ -47,8 +41,8 @@ export default function Register() {
       setError("Passwords do not match.");
       return;
     }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters.");
       return;
     }
     setLoading(true);
@@ -92,16 +86,16 @@ export default function Register() {
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="reg-email">Email Address</label>
-            <input id="reg-email" name="email" type="text" className="form-input"
-              placeholder="yourname@gmail.com" value={form.email} onChange={handleChange} required />
+            <input id="reg-email" name="email" type="email" autoComplete="email" className="form-input"
+              placeholder="you@company.com" value={form.email} onChange={handleChange} required />
             <small style={{ color: "#a0aec0", fontSize: "0.78rem", marginTop: 4, display: "block" }}>
-              Must be a Gmail address with letters (e.g. user123@gmail.com)
+              Use a work or personal email you can access.
             </small>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="reg-password">Password</label>
             <input id="reg-password" name="password" type="password" className="form-input"
-              placeholder="Min. 6 characters" value={form.password} onChange={handleChange} required />
+              placeholder="Min. 8 characters" value={form.password} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="confirm">Confirm Password</label>
